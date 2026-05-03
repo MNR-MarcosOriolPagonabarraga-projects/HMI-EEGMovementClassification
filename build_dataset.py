@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from load_data import EEGMatLoader
-from .config import (
+from config import (
     BANDPASS_H_FREQ, BANDPASS_L_FREQ, 
     CLASS_NAMES, EVENT_ID,
     EPOCH_TMAX, EPOCH_TMIN,
@@ -75,7 +75,7 @@ def _subject_folder_and_id(subject: str | int) -> tuple[str, int]:
 
 def preprocess_raw_inplace(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
     """EEG only → CAR → causal 8–30 Hz bandpass (mutates ``raw``)."""
-    raw.pick_types(eeg=True)
+    raw.pick('eeg')
     raw.set_eeg_reference("average", verbose=False)
     raw.filter(
         l_freq=BANDPASS_L_FREQ,

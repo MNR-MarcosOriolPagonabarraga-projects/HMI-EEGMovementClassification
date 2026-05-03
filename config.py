@@ -1,6 +1,8 @@
+from pathlib import Path
+
 # DATASET
-DATA_ROOT = "data/original"
-OUTPUT_DIR =  "data/processed"
+DATA_ROOT = Path("data/original")
+OUTPUT_DIR = Path("data/processed")
 TRAIN_OUTPUT = OUTPUT_DIR / "dataset_train.npz"
 TEST_OUTPUT = OUTPUT_DIR / "dataset_test.npz"
 
