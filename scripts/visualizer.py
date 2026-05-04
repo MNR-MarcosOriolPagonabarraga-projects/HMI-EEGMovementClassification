@@ -1,135 +1,276 @@
+import sys
 import os
 import re
-import customtkinter as ctk
-from tkinter import filedialog
 import mne
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout, 
+                             QVBoxLayout, QTreeView, QPushButton, QCheckBox, 
+                             QLabel, QSplitter, QDoubleSpinBox, QSpinBox, 
+                             QComboBox, QFormLayout, QGroupBox, QScrollArea)
+from PyQt6.QtGui import QFileSystemModel, QFont
+from PyQt6.QtCore import Qt
 
 from src.load_data import EEGMatLoader
 from src.pipeline import EEGPreprocessor
-from src.config import MOTOR_CHANNELS
 
-# --- UI Theme Configuration ---
-ctk.set_appearance_mode("dark")  # "dark", "light", or "system"
-ctk.set_default_color_theme("blue")  
-
-class ModernEEGVisualizer(ctk.CTk):
+class UnifiedEEGVisualizer(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.title("NeuroPipeline: BCI Visualizer")
-        self.geometry("400x380")
-        self.resizable(False, False)
+        self.setWindowTitle("NeuroPipeline: Unified BCI Visualizer")
+        self.resize(1300, 800) 
         
-        self.loader = EEGMatLoader(data_root="data/original")
-        self.raw = None 
+        self.data_root = "data/original"
+        self.loader = EEGMatLoader(data_root=self.data_root)
+        self.raw = None
+        self.current_plot_widget = None
+
+        # --- Main Layout Setup ---
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QHBoxLayout(central_widget)
+        main_layout.setContentsMargins(10, 10, 10, 10)
+
+        # Main Splitter (Left Column vs Right Graph)
+        self.main_splitter = QSplitter(Qt.Orientation.Horizontal)
+        main_layout.addWidget(self.main_splitter)
+
+        # Left Column Splitter (File Tree vs Controls)
+        self.left_splitter = QSplitter(Qt.Orientation.Vertical)
+        self.main_splitter.addWidget(self.left_splitter)
+
+        # ==========================================
+        # TOP-LEFT: FILE EXPLORER
+        # ==========================================
+        self.tree_panel = QWidget()
+        tree_layout = QVBoxLayout(self.tree_panel)
+        tree_layout.setContentsMargins(0, 0, 0, 0)
         
-        # --- UI Layout ---
-        self.grid_columnconfigure(0, weight=1)
+        lbl_explorer = QLabel("Dataset Explorer")
+        lbl_explorer.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        tree_layout.addWidget(lbl_explorer)
 
-        # Title Label
-        self.lbl_title = ctk.CTkLabel(self, text="EEG Preprocessing Pipeline", font=ctk.CTkFont(size=20, weight="bold"))
-        self.lbl_title.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.file_model = QFileSystemModel()
+        self.file_model.setRootPath(self.data_root)
+        self.file_model.setNameFilters(["*.mat"])
+        self.file_model.setNameFilterDisables(False) 
 
-        # Status Label
-        self.lbl_status = ctk.CTkLabel(self, text="No data loaded", text_color="gray")
-        self.lbl_status.grid(row=1, column=0, padx=20, pady=(0, 20))
-
-        # Load Button
-        self.btn_load = ctk.CTkButton(self, text="Load .mat File", command=self.load_file, fg_color="#2b7b5c", hover_color="#1e5c44")
-        self.btn_load.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
-
-        # Switches (Modern Checkboxes)
-        self.var_filter = ctk.BooleanVar(value=True)
-        self.sw_filter = ctk.CTkSwitch(self, text="Apply 8-30Hz Causal Filter", variable=self.var_filter)
-        self.sw_filter.grid(row=3, column=0, padx=40, pady=10, sticky="w")
+        self.tree = QTreeView()
+        self.tree.setModel(self.file_model)
+        self.tree.setRootIndex(self.file_model.index(self.data_root))
+        for i in range(1, 4): self.tree.hideColumn(i)
+        self.tree.doubleClicked.connect(self.on_file_double_clicked)
         
-        self.var_car = ctk.BooleanVar(value=True)
-        self.sw_car = ctk.CTkSwitch(self, text="Apply Common Average Reference", variable=self.var_car)
-        self.sw_car.grid(row=4, column=0, padx=40, pady=10, sticky="w")
+        tree_layout.addWidget(self.tree)
+        self.left_splitter.addWidget(self.tree_panel)
 
-        # Plot Button
-        self.btn_plot = ctk.CTkButton(self, text="Visualize Data", command=self.plot_data, state="disabled")
-        self.btn_plot.grid(row=5, column=0, padx=20, pady=(30, 20), sticky="ew")
+        # ==========================================
+        # BOTTOM-LEFT: PREPROCESSING CONTROLS
+        # ==========================================
+        self.control_panel = QWidget()
+        control_layout = QVBoxLayout(self.control_panel)
+        control_layout.setContentsMargins(0, 10, 0, 0)
 
+        lbl_controls = QLabel("Preprocessing Pipeline")
+        lbl_controls.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        control_layout.addWidget(lbl_controls)
 
-    def load_file(self):
-        filepath = filedialog.askopenfilename(filetypes=[("MAT files", "*.mat")])
-        if not filepath: return
+        self.lbl_status = QLabel("Ready. Select a file.")
+        self.lbl_status.setStyleSheet("color: gray; margin-bottom: 5px;")
+        self.lbl_status.setWordWrap(True)
+        control_layout.addWidget(self.lbl_status)
+
+        # Scroll area in case controls get too tall
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(0,0,10,0)
+
+        # --- Filter Group ---
+        grp_filter = QGroupBox("Spectral Filtering")
+        form_filter = QFormLayout(grp_filter)
         
-        # Extract filename to parse Subject and Run using Regex
+        self.chk_bp = QCheckBox("Causal Bandpass Filter")
+        self.chk_bp.setChecked(True)
+        self.spin_lfreq = QDoubleSpinBox(); self.spin_lfreq.setRange(0.1, 100.0); self.spin_lfreq.setValue(8.0)
+        self.spin_hfreq = QDoubleSpinBox(); self.spin_hfreq.setRange(1.0, 200.0); self.spin_hfreq.setValue(30.0)
+        self.chk_bp.toggled.connect(self.spin_lfreq.setEnabled)
+        self.chk_bp.toggled.connect(self.spin_hfreq.setEnabled)
+        
+        form_filter.addRow(self.chk_bp)
+        form_filter.addRow("Low Cutoff (Hz):", self.spin_lfreq)
+        form_filter.addRow("High Cutoff (Hz):", self.spin_hfreq)
+
+        self.chk_notch = QCheckBox("Notch Filter (Powerline)")
+        self.chk_notch.setChecked(False)
+        self.combo_notch = QComboBox()
+        self.combo_notch.addItems(["50 Hz (EU)", "60 Hz (US)"])
+        self.combo_notch.setEnabled(False)
+        self.chk_notch.toggled.connect(self.combo_notch.setEnabled)
+
+        form_filter.addRow(self.chk_notch)
+        form_filter.addRow("Frequency:", self.combo_notch)
+        scroll_layout.addWidget(grp_filter)
+
+        # --- Spatial & Resampling Group ---
+        grp_other = QGroupBox("Spatial & Sampling")
+        form_other = QFormLayout(grp_other)
+
+        self.chk_car = QCheckBox("Apply Common Average Reference (CAR)")
+        self.chk_car.setChecked(True)
+        form_other.addRow(self.chk_car)
+
+        self.chk_resample = QCheckBox("Downsample Data")
+        self.chk_resample.setChecked(False)
+        self.spin_resample = QSpinBox(); self.spin_resample.setRange(50, 500); self.spin_resample.setValue(250)
+        self.spin_resample.setEnabled(False)
+        self.chk_resample.toggled.connect(self.spin_resample.setEnabled)
+        
+        form_other.addRow(self.chk_resample)
+        form_other.addRow("Target Rate (Hz):", self.spin_resample)
+        scroll_layout.addWidget(grp_other)
+
+        scroll_layout.addStretch()
+        scroll.setWidget(scroll_content)
+        control_layout.addWidget(scroll)
+
+        self.btn_plot = QPushButton("Apply & Visualize")
+        self.btn_plot.setEnabled(False)
+        self.btn_plot.setStyleSheet("padding: 10px; margin-top: 10px; font-weight: bold; background-color: #0e639c;")
+        self.btn_plot.clicked.connect(self.process_and_plot)
+        control_layout.addWidget(self.btn_plot)
+
+        self.left_splitter.addWidget(self.control_panel)
+
+        # ==========================================
+        # RIGHT PANEL: VISUALIZER
+        # ==========================================
+        self.right_panel = QWidget()
+        self.right_layout = QVBoxLayout(self.right_panel)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.placeholder_lbl = QLabel("Visualizer Blank\n\nDouble-click a .mat file to load.")
+        self.placeholder_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.placeholder_lbl.setStyleSheet("color: #666666; font-size: 18px;")
+        self.right_layout.addWidget(self.placeholder_lbl)
+
+        self.main_splitter.addWidget(self.right_panel)
+
+        # Set splitter sizes
+        self.left_splitter.setSizes([400, 400]) # 50/50 split on the left
+        self.main_splitter.setSizes([350, 950]) # Left column width vs Graph width
+
+    # --- Methods ---
+
+    def on_file_double_clicked(self, index):
+        if self.file_model.isDir(index): return 
+        
+        filepath = self.file_model.filePath(index)
         filename = os.path.basename(filepath)
-        match = re.search(r"ME_S(\d+)_r(\d+)\.mat", filename, re.IGNORECASE)
         
+        match = re.search(r"ME_S(\d+)_r(\d+)\.mat", filename, re.IGNORECASE)
         if not match:
-            self.lbl_status.configure(text="Error: Invalid filename format.", text_color="red")
+            self.lbl_status.setText("Error: Invalid filename format.")
+            self.lbl_status.setStyleSheet("color: #ff4444;")
             return
-            
+
         subject_id, run_id = int(match.group(1)), int(match.group(2))
-        self.lbl_status.configure(text=f"Loading Sub {subject_id} | Run {run_id}...", text_color="orange")
-        self.update() # Force UI update
+        self.lbl_status.setText(f"Loading Sub {subject_id} | Run {run_id}...")
+        self.lbl_status.setStyleSheet("color: #ffaa00;")
+        QApplication.processEvents() 
 
         try:
-            # Load the data using your custom loader
             self.raw = self.loader.load_run(subject=subject_id, run=run_id, sfreq=512.0)
             
-            # Keep only the motor channels right away to save memory
-            # self.raw.pick(MOTOR_CHANNELS)
-            
-            # Map the ugly string codes to readable markers
             event_mapping = {
-                '1536': 'Elbow Flexion', 
-                '1537': 'Elbow Extension', 
-                '1538': 'Supination',
-                '1539': 'Pronation',
-                '1540': 'Hand Close',
-                '1541': 'Hand Open',
-                '1542': 'Rest'
+                '1536': 'Elbow Flexion', '1537': 'Elbow Ext', 
+                '1538': 'Supination', '1539': 'Pronation',
+                '1540': 'Hand Close', '1541': 'Hand Open', '1542': 'Rest'
             }
-            # Rename annotations if they exist in the raw file
             current_annots = self.raw.annotations.description
             rename_dict = {k: v for k, v in event_mapping.items() if k in current_annots}
             if rename_dict:
                 self.raw.annotations.rename(rename_dict)
 
-            self.lbl_status.configure(text=f"Loaded: {filename}", text_color="#34c759")
-            self.btn_plot.configure(state="normal")
+            self.lbl_status.setText(f"Loaded: {filename}\nReady.")
+            self.lbl_status.setStyleSheet("color: #00cc66;")
+            self.btn_plot.setEnabled(True)
             
-        except Exception as e:
-            self.lbl_status.configure(text=f"Failed to load: {e}", text_color="red")
+            self.process_and_plot()
 
-    def plot_data(self):
+        except Exception as e:
+            self.lbl_status.setText(f"Failed to load: {e}")
+            self.lbl_status.setStyleSheet("color: #ff4444;")
+
+    def process_and_plot(self):
         if self.raw is None: return
-        
-        self.lbl_status.configure(text="Processing pipeline...", text_color="orange")
-        self.update()
-        
-        # 1. Instantiate the pipeline with UI switch states
+
+        self.lbl_status.setText("Processing pipeline...")
+        self.lbl_status.setStyleSheet("color: #ffaa00;")
+        QApplication.processEvents()
+
+        # Parse UI inputs
+        notch_val = 50.0 if "50" in self.combo_notch.currentText() else 60.0
+
         pipeline = EEGPreprocessor(
-            apply_filter=self.var_filter.get(),
-            apply_car=self.var_car.get()
+            apply_filter=self.chk_bp.isChecked(),
+            l_freq=self.spin_lfreq.value(),
+            h_freq=self.spin_hfreq.value(),
+            apply_notch=self.chk_notch.isChecked(),
+            notch_freq=notch_val,
+            apply_car=self.chk_car.isChecked(),
+            apply_resample=self.chk_resample.isChecked(),
+            resample_freq=self.spin_resample.value()
         )
         
-        # 2. Process the data
         processed_raw = pipeline.process(self.raw)
-        
-        self.lbl_status.configure(text="Plotting...", text_color="orange")
-        self.update()
-        
-        # 3. Launch MNE's interactive Qt viewer
-        processed_raw.plot(
-            block=True, 
-            duration=10.0,         # STRICTLY limits the view to 10 seconds (efficient chunking)
-            n_channels=len(30), # Fits all motor channels on screen
-            scalings=dict(eeg=40e-6), # Standardize voltage scale (40 microvolts)
-            clipping='clamp',      # Prevents wild artifact spikes from ruining the view
-            title="Interactive EEG Viewer (MNE Qt)"
+
+        self.lbl_status.setText("Generating Plot...")
+        QApplication.processEvents()
+
+        if self.placeholder_lbl is not None:
+            self.placeholder_lbl.deleteLater()
+            self.placeholder_lbl = None
+
+        if self.current_plot_widget is not None:
+            self.current_plot_widget.close()
+            self.right_layout.removeWidget(self.current_plot_widget)
+            self.current_plot_widget.deleteLater()
+
+        self.current_plot_widget = processed_raw.plot(
+            show=False,             
+            duration=10.0,         
+            n_channels=60,            
+            scalings=dict(eeg=40e-6), 
+            clipping='clamp',
         )
         
-        self.lbl_status.configure(text="Ready.", text_color="#34c759")
+        self.right_layout.addWidget(self.current_plot_widget)
+        self.lbl_status.setText("Viewing Data.")
+        self.lbl_status.setStyleSheet("color: #00cc66;")
+
+# --- Dark Mode Styling ---
+DARK_STYLESHEET = """
+QMainWindow { background-color: #1e1e1e; color: #ffffff; }
+QWidget { background-color: #1e1e1e; color: #ffffff; font-family: Arial; }
+QTreeView { background-color: #252526; border: none; outline: none; }
+QTreeView::item:selected { background-color: #094771; }
+QGroupBox { font-weight: bold; border: 1px solid #444; border-radius: 5px; margin-top: 10px; padding-top: 15px; }
+QGroupBox::title { subcontrol-origin: margin; left: 10px; top: -5px; }
+QPushButton { border-radius: 4px; color: white; }
+QPushButton:hover { background-color: #1177bb; }
+QPushButton:disabled { background-color: #333333; color: #777777; }
+QSplitter::handle { background-color: #333333; }
+QDoubleSpinBox, QSpinBox, QComboBox { background-color: #333333; color: white; border: 1px solid #555; padding: 3px; }
+QDoubleSpinBox:disabled, QSpinBox:disabled, QComboBox:disabled { background-color: #222222; color: #777; }
+"""
 
 if __name__ == "__main__":
-    # Ensure MNE uses the high-performance Qt backend
     mne.viz.set_browser_backend('qt') 
+    app = QApplication(sys.argv)
+    app.setStyleSheet(DARK_STYLESHEET)
     
-    app = ModernEEGVisualizer()
-    app.mainloop()
+    window = UnifiedEEGVisualizer()
+    window.show() 
+    sys.exit(app.exec())
