@@ -1,5 +1,3 @@
-# src/pipeline.py
-import mne
 
 class EEGPreprocessor:
     def __init__(self, 
