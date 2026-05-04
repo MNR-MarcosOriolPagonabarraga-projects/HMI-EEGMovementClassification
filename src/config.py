@@ -32,6 +32,12 @@ EVENT_ID: dict[str, int] = {
     "1542": 3,  # rest
 }
 
+MOTOR_CHANNELS = [
+    'FC3', 'FCz', 'FC4', 
+    'C3', 'Cz', 'C4', 
+    'CP3', 'CPz', 'CP4'
+]
+
 # TRAINING
 TRAIN_SIZE = 0.85
 TEST_SIZE = 0.15 
