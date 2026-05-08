@@ -1,8 +1,9 @@
+from .config import BANDPASS_L_FREQ, BANDPASS_H_FREQ, NOTCH_FREQ
 
 class EEGPreprocessor:
     def __init__(self, 
-                 apply_filter=True, l_freq=8.0, h_freq=30.0,
-                 apply_notch=False, notch_freq=50.0,
+                 apply_filter=True, l_freq=BANDPASS_L_FREQ, h_freq=BANDPASS_H_FREQ,
+                 apply_notch=False,
                  apply_car=True,
                  apply_resample=False, resample_freq=250.0):
         
@@ -11,7 +12,7 @@ class EEGPreprocessor:
         self.h_freq = h_freq
         
         self.apply_notch = apply_notch
-        self.notch_freq = notch_freq
+        self.notch_freq = NOTCH_FREQ
         
         self.apply_car = apply_car
         

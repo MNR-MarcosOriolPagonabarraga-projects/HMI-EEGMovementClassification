@@ -7,12 +7,14 @@ TRAIN_OUTPUT = OUTPUT_DIR / "dataset_train.npz"
 TEST_OUTPUT = OUTPUT_DIR / "dataset_test.npz"
 
 # PREPROCESSING
-SFREQ = 512.0
+RECORDING_SFREQ = 512.0  # EEGLAB .mat sample rate; event latencies are in these samples
+SFREQ = 256.0  # after EEGMatLoader resampling; epochs and processed .npz
 EPOCH_TMIN = -0.5
-EPOCH_TMAX = 3.0
-BANDPASS_L_FREQ = 8.0
-BANDPASS_H_FREQ = 30.0
-REJECT_EEG_UV = 150.0
+EPOCH_TMAX = 3
+BANDPASS_L_FREQ = 3
+BANDPASS_H_FREQ = 30
+NOTCH_FREQ = 50.0
+REJECT_EEG_UV = 200.0
 
 # LABELS
 CLASS_NAMES: tuple[str, ...] = (
@@ -33,11 +35,13 @@ EVENT_ID: dict[str, int] = {
 }
 
 MOTOR_CHANNELS = [
-    'FC3', 'FCz', 'FC4', 
-    'C3', 'Cz', 'C4', 
-    'CP3', 'CPz', 'CP4'
+    'FCz', 'C3', 'C4', 'Cz'
 ]
 
 # TRAINING
 TRAIN_SIZE = 0.85
-TEST_SIZE = 0.15 
+TEST_SIZE = 0.15
+
+# CSP + classifier
+CSP_N_COMPONENTS = 6
+CSP_REG = None

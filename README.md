@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ## Repository structure
 This repository is intended to do the full pipeline of a AI/ML learning application. It will go from dataset exploration and processing, to model training and validation.
 
-```txt
+```bash
 ├── data
 │   ├── original
 │   │   ├── S1
@@ -46,7 +46,7 @@ This repository is intended to do the full pipeline of a AI/ML learning applicat
 │   │   │   ├── ME_S03_r01.mat
 │   │   │   ├── ...
 │   │   ├── ...
-│   └── processed // Used to train model
+│   └── processed # Used to train model
 │       ├── dataset_test.npz
 │       └── dataset_train.npz
 ├── docs

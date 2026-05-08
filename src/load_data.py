@@ -1,17 +1,46 @@
+import math
 from pathlib import Path
+
 import mne
 import numpy as np
 from mne.io import RawArray
 from scipy.io import loadmat
 
+from src.config import RECORDING_SFREQ
 from src.utils import _chan_label, _infer_ch_type, _xyz_mm, _events_to_annotations
+
 
 class EEGMatLoader:
     def __init__(
-        self, data_root: str | Path = "data", *, channels: list[str] | None = None
+        self,
+        data_root: str | Path = "data",
+        *,
+        channels: list[str] | None = None,
+        native_sfreq: float | None = None,
+        target_sfreq: float | None = None,
     ) -> None:
+        """Parameters
+        ----------
+        native_sfreq
+            Sample rate of the stored continuous data and of event latencies in the
+            ``.mat`` file. Defaults to :data:`src.config.RECORDING_SFREQ`.
+        target_sfreq
+            If set, :meth:`load_run` returns data resampled to this rate (MNE adjusts
+            annotation onsets accordingly). If ``None``, no resampling is applied.
+        """
         self.data_root = Path(data_root)
         self.channels = channels
+        self.native_sfreq = float(RECORDING_SFREQ if native_sfreq is None else native_sfreq)
+        self.target_sfreq = None if target_sfreq is None else float(target_sfreq)
+
+    @property
+    def output_sfreq(self) -> float:
+        """Sampling rate of :meth:`load_run` output (after optional resampling)."""
+        if self.target_sfreq is None or math.isclose(
+            self.target_sfreq, self.native_sfreq
+        ):
+            return self.native_sfreq
+        return self.target_sfreq
 
     def _normalize_subject(self, subject: str | int) -> tuple[str, str]:
         """Return (folder_name, file_token) e.g. (``S1``, ``S01``)."""
@@ -102,38 +131,27 @@ class EEGMatLoader:
         subject: str | int,
         run: int,
         *,
-        sfreq: float,
         apply_montage: bool = True,
         scale_eeg_eog_uv_to_v: bool = True,
     ) -> RawArray:
-        """Load one run and return an :class:`mne.io.RawArray`.
+        """Load one run and return an :class:`mne.io.RawArray` at :attr:`output_sfreq`.
 
-        Parameters
-        ----------
-        subject
-            Subject folder id (``1``, ``\"S1\"``, ``\"1\"`` → ``data/S1/``).
-        run
-            Run number (1 → ``..._r01.mat``).
-        sfreq
-            Sampling frequency in Hz. These trimmed exports do not contain
-            ``EEG.srate``; you must set this from your study metadata.
-        apply_montage
-            If True, set a digitization montage for channels that define
-            non-empty ``X/Y/Z`` in ``chanlocs`` (EEG cap channels).
-        scale_eeg_eog_uv_to_v
-            If True, scale ``eeg`` and ``eog`` channels by ``1e-6`` so data are
-            in volts, as expected by MNE. Non-EEG channels (``misc``) are left
-            unchanged.
+        Annotations are built at :attr:`native_sfreq`, then resampling (when
+        configured) updates event times so epoching stays aligned.
         """
         path = self.resolve_run_path(subject, run)
         raw = EEGMatLoader.load_mat_file(
             path,
-            sfreq=sfreq,
+            sfreq=self.native_sfreq,
             apply_montage=apply_montage,
             scale_eeg_eog_uv_to_v=scale_eeg_eog_uv_to_v,
         )
-        # Only keep requested channels, if specified
         if self.channels is not None:
             raw.pick(self.channels)
+
+        if self.target_sfreq is not None and not math.isclose(
+            self.target_sfreq, self.native_sfreq
+        ):
+            raw.resample(self.target_sfreq, npad="auto", verbose=False)
 
         return raw

@@ -11,6 +11,7 @@ from PyQt6.QtCore import Qt
 
 from src.load_data import EEGMatLoader
 from src.pipeline import EEGPreprocessor
+from src.config import MOTOR_CHANNELS
 
 class UnifiedEEGVisualizer(QMainWindow):
     def __init__(self):
@@ -20,7 +21,7 @@ class UnifiedEEGVisualizer(QMainWindow):
         self.resize(1300, 800) 
         
         self.data_root = "data/original"
-        self.loader = EEGMatLoader(data_root=self.data_root)
+        self.loader = EEGMatLoader(data_root=self.data_root, channels=MOTOR_CHANNELS)
         self.raw = None
         self.current_plot_widget = None
 
@@ -93,8 +94,8 @@ class UnifiedEEGVisualizer(QMainWindow):
         
         self.chk_bp = QCheckBox("Causal Bandpass Filter")
         self.chk_bp.setChecked(True)
-        self.spin_lfreq = QDoubleSpinBox(); self.spin_lfreq.setRange(0.1, 100.0); self.spin_lfreq.setValue(8.0)
-        self.spin_hfreq = QDoubleSpinBox(); self.spin_hfreq.setRange(1.0, 200.0); self.spin_hfreq.setValue(30.0)
+        self.spin_lfreq = QDoubleSpinBox(); self.spin_lfreq.setRange(0.1, 100.0); self.spin_lfreq.setValue(0.3)
+        self.spin_hfreq = QDoubleSpinBox(); self.spin_hfreq.setRange(1.0, 200.0); self.spin_hfreq.setValue(3)
         self.chk_bp.toggled.connect(self.spin_lfreq.setEnabled)
         self.chk_bp.toggled.connect(self.spin_hfreq.setEnabled)
         
@@ -106,7 +107,7 @@ class UnifiedEEGVisualizer(QMainWindow):
         self.chk_notch.setChecked(False)
         self.combo_notch = QComboBox()
         self.combo_notch.addItems(["50 Hz (EU)", "60 Hz (US)"])
-        self.combo_notch.setEnabled(False)
+        self.combo_notch.setEnabled(True)
         self.chk_notch.toggled.connect(self.combo_notch.setEnabled)
 
         form_filter.addRow(self.chk_notch)
@@ -123,7 +124,7 @@ class UnifiedEEGVisualizer(QMainWindow):
 
         self.chk_resample = QCheckBox("Downsample Data")
         self.chk_resample.setChecked(False)
-        self.spin_resample = QSpinBox(); self.spin_resample.setRange(50, 500); self.spin_resample.setValue(250)
+        self.spin_resample = QSpinBox(); self.spin_resample.setRange(50, 500); self.spin_resample.setValue(256)
         self.spin_resample.setEnabled(False)
         self.chk_resample.toggled.connect(self.spin_resample.setEnabled)
         
@@ -181,7 +182,7 @@ class UnifiedEEGVisualizer(QMainWindow):
         QApplication.processEvents() 
 
         try:
-            self.raw = self.loader.load_run(subject=subject_id, run=run_id, sfreq=512.0)
+            self.raw = self.loader.load_run(subject=subject_id, run=run_id)
             
             event_mapping = {
                 '1536': 'Elbow Flexion', '1537': 'Elbow Ext', 
@@ -210,15 +211,11 @@ class UnifiedEEGVisualizer(QMainWindow):
         self.lbl_status.setStyleSheet("color: #ffaa00;")
         QApplication.processEvents()
 
-        # Parse UI inputs
-        notch_val = 50.0 if "50" in self.combo_notch.currentText() else 60.0
-
         pipeline = EEGPreprocessor(
             apply_filter=self.chk_bp.isChecked(),
             l_freq=self.spin_lfreq.value(),
             h_freq=self.spin_hfreq.value(),
             apply_notch=self.chk_notch.isChecked(),
-            notch_freq=notch_val,
             apply_car=self.chk_car.isChecked(),
             apply_resample=self.chk_resample.isChecked(),
             resample_freq=self.spin_resample.value()
