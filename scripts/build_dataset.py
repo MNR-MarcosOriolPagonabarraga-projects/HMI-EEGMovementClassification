@@ -209,10 +209,47 @@ def _cue_locked_epochs(raw: mne.io.BaseRaw) -> mne.Epochs:
 
 
 def _epochs_to_arrays(epochs: mne.Epochs) -> tuple[np.ndarray, np.ndarray]:
+    """Extracts data, normalizes per epoch/channel, and shapes for PyTorch."""
+    # X shape: (epochs, channels, time)
     X = epochs.get_data(copy=True).astype(np.float32, copy=False)
     y = epochs.events[:, 2].astype(np.int64, copy=False)
-    return X, y
+    
+    # Z-SCORE NORMALIZATION (Per-epoch, Per-channel)
+    mean = np.mean(X, axis=2, keepdims=True)
+    std = np.std(X, axis=2, keepdims=True)
+    
+    # Apply normalization
+    X_norm = (X - mean) / (std + 1e-8)
+    
+    return X_norm, y
 
+
+def _write_split_npz(
+    path: Path,
+    *,
+    X: np.ndarray,
+    y: np.ndarray,
+    sfreq: float,
+    ch_names: list[str],
+    split_tag: str,
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(
+        path,
+        X=X,
+        y=y,
+        sfreq=np.array([sfreq], dtype=np.float64),
+        ch_names=np.array(ch_names, dtype=object),
+        class_names=np.array(CLASS_NAMES, dtype=object),
+        split=np.array([split_tag], dtype=object),
+        epoch_tmin=np.array([EPOCH_TMIN]),
+        epoch_tmax=np.array([EPOCH_TMAX]),
+        bandpass_hz=np.array([BANDPASS_L_FREQ, BANDPASS_H_FREQ], dtype=np.float64),
+        # Updated metadata to reflect the removal of minimum phase
+        causal_filter_phase=np.array(["zero"], dtype=object), 
+        reject_eeg_uv=np.array([REJECT_EEG_UV]),
+        normalization=np.array(["per_epoch_channel_zscore"], dtype=object) # Added tracker
+    )
 
 def _trials_for_subject(
     loader: EEGMatLoader,
@@ -252,32 +289,6 @@ def _trials_for_subject(
         )
 
     return np.concatenate(xs, axis=0), np.concatenate(ys, axis=0), ch_names_ref
-
-
-def _write_split_npz(
-    path: Path,
-    *,
-    X: np.ndarray,
-    y: np.ndarray,
-    sfreq: float,
-    ch_names: list[str],
-    split_tag: str,
-) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(
-        path,
-        X=X,
-        y=y,
-        sfreq=np.array([sfreq], dtype=np.float64),
-        ch_names=np.array(ch_names, dtype=object),
-        class_names=np.array(CLASS_NAMES, dtype=object),
-        split=np.array([split_tag], dtype=object),
-        epoch_tmin=np.array([EPOCH_TMIN]),
-        epoch_tmax=np.array([EPOCH_TMAX]),
-        bandpass_hz=np.array([BANDPASS_L_FREQ, BANDPASS_H_FREQ], dtype=np.float64),
-        causal_filter_phase=np.array(["minimum"], dtype=object),
-        reject_eeg_uv=np.array([REJECT_EEG_UV]),
-    )
 
 
 if __name__ == "__main__":

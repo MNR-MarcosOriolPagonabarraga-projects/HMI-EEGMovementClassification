@@ -25,19 +25,23 @@ class EEGPreprocessor:
         
         # 1. Notch Filter (Remove powerline noise)
         if self.apply_notch:
-            raw_proc.notch_filter(freqs=self.notch_freq)
-            
+            raw_proc.notch_filter(freqs=self.notch_freq, verbose=False)
+
         # 2. Bandpass Filter (Causal)
         if self.apply_filter:
-            raw_proc.filter(l_freq=self.l_freq, h_freq=self.h_freq, phase='minimum')
-            
+            raw_proc.filter(
+                l_freq=self.l_freq,
+                h_freq=self.h_freq,
+                phase="zero",
+                verbose=False,
+            )
+
         # 3. Common Average Reference (Spatial Filter)
         if self.apply_car:
-            raw_proc.set_eeg_reference('average')
-            
+            raw_proc.set_eeg_reference("average", verbose=False)
+
         # 4. Downsampling (Do this LAST to prevent aliasing artifacts)
         if self.apply_resample:
-            # MNE's resample automatically handles annotation timing adjustments
-            raw_proc.resample(sfreq=self.resample_freq)
+            raw_proc.resample(sfreq=self.resample_freq, verbose=False)
             
         return raw_proc
