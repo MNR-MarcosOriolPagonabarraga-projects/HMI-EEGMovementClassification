@@ -1,10 +1,9 @@
-# src/pipeline.py
-import mne
+from .config import BANDPASS_L_FREQ, BANDPASS_H_FREQ, NOTCH_FREQ
 
 class EEGPreprocessor:
     def __init__(self, 
-                 apply_filter=True, l_freq=8.0, h_freq=30.0,
-                 apply_notch=False, notch_freq=50.0,
+                 apply_filter=True, l_freq=BANDPASS_L_FREQ, h_freq=BANDPASS_H_FREQ,
+                 apply_notch=False,
                  apply_car=True,
                  apply_resample=False, resample_freq=250.0):
         
@@ -13,7 +12,7 @@ class EEGPreprocessor:
         self.h_freq = h_freq
         
         self.apply_notch = apply_notch
-        self.notch_freq = notch_freq
+        self.notch_freq = NOTCH_FREQ
         
         self.apply_car = apply_car
         
@@ -26,19 +25,23 @@ class EEGPreprocessor:
         
         # 1. Notch Filter (Remove powerline noise)
         if self.apply_notch:
-            raw_proc.notch_filter(freqs=self.notch_freq)
-            
+            raw_proc.notch_filter(freqs=self.notch_freq, verbose=False)
+
         # 2. Bandpass Filter (Causal)
         if self.apply_filter:
-            raw_proc.filter(l_freq=self.l_freq, h_freq=self.h_freq, phase='minimum')
-            
+            raw_proc.filter(
+                l_freq=self.l_freq,
+                h_freq=self.h_freq,
+                phase="zero",
+                verbose=False,
+            )
+
         # 3. Common Average Reference (Spatial Filter)
         if self.apply_car:
-            raw_proc.set_eeg_reference('average')
-            
+            raw_proc.set_eeg_reference("average", verbose=False)
+
         # 4. Downsampling (Do this LAST to prevent aliasing artifacts)
         if self.apply_resample:
-            # MNE's resample automatically handles annotation timing adjustments
-            raw_proc.resample(sfreq=self.resample_freq)
+            raw_proc.resample(sfreq=self.resample_freq, verbose=False)
             
         return raw_proc

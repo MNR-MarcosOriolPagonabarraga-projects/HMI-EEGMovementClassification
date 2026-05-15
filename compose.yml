@@ -1,0 +1,8 @@
+services:
+  dev_env:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    command: tail -f /dev/null
