@@ -1,8 +1,7 @@
-"""Shared helpers for loading EEGLAB ``*.mat`` structures into MNE."""
-
 import mne
 import numpy as np
 from scipy.io.matlab import mat_struct
+import matplotlib.pyplot as plt
 
 
 def _chan_label(ch: mat_struct) -> str:
@@ -94,3 +93,45 @@ def _events_to_annotations(
     return mne.Annotations(
         onset=onsets, duration=durations, description=descs,
     )
+
+
+def load_npz_split(path) -> tuple[np.ndarray, np.ndarray, dict]:
+    z = np.load(path, allow_pickle=True)
+    X = np.asarray(z["X"], dtype=np.float64)
+    X_psd = np.asarray(z["X_psd"], dtype=np.float64)
+    y = np.asarray(z["y"]).astype(np.int64).ravel()
+    meta = {
+        "sfreq": float(np.asarray(z["sfreq"]).squeeze()),
+        "ch_names": [str(x) for x in np.asarray(z["ch_names"], dtype=object).ravel()],
+        "split": str(np.asarray(z["split"]).ravel()[0]),
+        "path": path,
+    }
+    return X, X_psd, y, meta
+
+
+def plot_history(history):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+    # Plot Loss
+    ax1.plot(history['train_loss'], label='Train Loss', color='tab:blue', lw=2)
+    ax1.plot(history['val_loss'], label='Validation Loss', color='tab:red', lw=2)
+    ax1.set_title('CrossEntropy Loss History')
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Loss')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Plot Accuracy
+    ax2.plot(history['train_acc'], label='Train Accuracy', color='tab:blue', lw=2)
+    ax2.plot(history['val_acc'], label='Validation Accuracy', color='tab:red', lw=2)
+    ax2.axhline(25, color='black', linestyle='--', alpha=0.5, label='Chance (25%)')
+    ax2.set_title('Classification Accuracy')
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Accuracy (%)')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    fig = plt.gcf()
+
+    return fig

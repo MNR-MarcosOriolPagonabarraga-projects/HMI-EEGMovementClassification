@@ -1,4 +1,6 @@
 import math
+import torch
+from torch.utils.data import Dataset
 from pathlib import Path
 
 import mne
@@ -155,3 +157,38 @@ class EEGMatLoader:
             raw.resample(self.target_sfreq, npad="auto", verbose=False)
 
         return raw
+
+
+class EEGPsdDataset(Dataset):
+    def __init__(self, X_raw, X_psd, y, is_train=False, crop_size=256):
+        self.X_raw = torch.from_numpy(X_raw).float()
+        self.X_psd = torch.from_numpy(X_psd).float()
+        self.y = torch.from_numpy(y).long()
+        self.is_train = is_train
+        self.crop_size = crop_size
+        
+        if self.X_raw.ndim == 3:
+            self.X_raw = self.X_raw.unsqueeze(1)
+        if self.X_psd.ndim == 3:
+            self.X_psd = self.X_psd.unsqueeze(1)
+            
+        self.max_time = self.X_raw.shape[-1] # Should be 321
+
+    def __len__(self):
+        return len(self.y)
+
+    def __getitem__(self, idx):
+        raw = self.X_raw[idx]
+        
+        # --- TEMPORAL CROPPING ---
+        if self.is_train:
+            # Pick a random start point
+            max_start = self.max_time - self.crop_size
+            start = torch.randint(0, max_start + 1, (1,)).item()
+        else:
+            # Always take the exact center for validation to keep it deterministic
+            start = (self.max_time - self.crop_size) // 2
+            
+        raw_cropped = raw[:, :, start : start + self.crop_size]
+        
+        return raw_cropped, self.X_psd[idx], self.y[idx]

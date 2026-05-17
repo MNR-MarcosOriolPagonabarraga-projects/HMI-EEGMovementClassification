@@ -4,6 +4,7 @@ from pathlib import Path
 import mne
 import numpy as np
 from sklearn.model_selection import train_test_split
+from scipy.signal import welch
 
 from src.config import (
     BANDPASS_H_FREQ,
@@ -52,13 +53,14 @@ def main() -> None:
 
     # Concatenate all trial tensors (trial × channel × time)
     X_chunks: list[np.ndarray] = []
+    X_psd_chunks: list[np.ndarray] = []
     y_chunks: list[np.ndarray] = []
     ch_names_global: list[str] | None = None
 
     for sid in subject_ids:
         tag = _subject_folder_and_id(sid)[0].upper()
         try:
-            Xs, ys, chs = _trials_for_subject(loader, sid, preprocessor)
+            Xs, X_psd, ys, chs = _trials_for_subject(loader, sid, preprocessor)
         except (FileNotFoundError, RuntimeError) as exc:
             print(f"[build_dataset] skip {tag}: {exc}")
             continue
@@ -72,25 +74,28 @@ def main() -> None:
             )
 
         X_chunks.append(Xs)
+        X_psd_chunks.append(X_psd)
         y_chunks.append(ys)
 
     if not X_chunks or ch_names_global is None:
         raise RuntimeError("No pooled data assembled (check logs / raw tree).")
 
     X = np.concatenate(X_chunks, axis=0)
+    X_psd = np.concatenate(X_psd_chunks, axis=0)
     y = np.concatenate(y_chunks, axis=0)
     counts = tuple(int((y == c).sum()) for c in range(len(CLASS_NAMES)))
     print(f"[build_dataset] pooled X{X.shape}; per-class counts {counts}")
 
-    # 4) Stratified train/test partition (sklearn)
-    X_train, X_test, y_train, y_test = train_test_split(
+    X_train, X_test, X_train_psd, X_test_psd, y_train, y_test = train_test_split(
         X,
+        X_psd,
         y,
         test_size=TEST_SIZE,
         stratify=y,
         random_state=42,
         shuffle=True,
     )
+
     train_frac_real = len(y_train) / len(y)
     test_frac_real = len(y_test) / len(y)
     print(
@@ -104,6 +109,7 @@ def main() -> None:
     _write_split_npz(
         TRAIN_OUTPUT,
         X=X_train,
+        X_psd=X_train_psd,
         y=y_train,
         sfreq=loader.output_sfreq,
         ch_names=ch_names_global,
@@ -112,6 +118,7 @@ def main() -> None:
     _write_split_npz(
         TEST_OUTPUT,
         X=X_test,
+        X_psd=X_test_psd,
         y=y_test,
         sfreq=loader.output_sfreq,
         ch_names=ch_names_global,
@@ -210,6 +217,7 @@ def _cue_locked_epochs(raw: mne.io.BaseRaw) -> mne.Epochs:
 
 def _epochs_to_arrays(epochs: mne.Epochs) -> tuple[np.ndarray, np.ndarray]:
     """Extracts data, normalizes per epoch/channel, and shapes for PyTorch."""
+    # 1. Take the raw signal for the shape feature
     # X shape: (epochs, channels, time)
     X = epochs.get_data(copy=True).astype(np.float32, copy=False)
     y = epochs.events[:, 2].astype(np.int64, copy=False)
@@ -220,14 +228,26 @@ def _epochs_to_arrays(epochs: mne.Epochs) -> tuple[np.ndarray, np.ndarray]:
     
     # Apply normalization
     X_norm = (X - mean) / (std + 1e-8)
+
+    # 2. Take the PSD for the shape feature
+    sfreq = epochs.info['sfreq']
+    freqs, psd = welch(X_norm, fs=sfreq, nperseg=int(sfreq)) # 1s segments
     
-    return X_norm, y
+    # Filter frequencies between 3 and 30Hz
+    idx = np.where((freqs >= 3) & (freqs <= 30))[0]
+    psd_feat = psd[:, :, idx]
+    
+    # Apply Log-transform (Essential for spectral feature normalization)
+    X_psd = np.log10(psd_feat + 1e-10).astype(np.float32)
+    
+    return X_norm, X_psd, y
 
 
 def _write_split_npz(
     path: Path,
     *,
     X: np.ndarray,
+    X_psd: np.ndarray,
     y: np.ndarray,
     sfreq: float,
     ch_names: list[str],
@@ -237,6 +257,7 @@ def _write_split_npz(
     np.savez_compressed(
         path,
         X=X,
+        X_psd=X_psd,
         y=y,
         sfreq=np.array([sfreq], dtype=np.float64),
         ch_names=np.array(ch_names, dtype=object),
@@ -255,9 +276,11 @@ def _trials_for_subject(
     loader: EEGMatLoader,
     subject: str | int,
     preprocessor: EEGPreprocessor,
-) -> tuple[np.ndarray, np.ndarray, list[str]]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[str]]:
     """All runs for one subject → stacked trial arrays and channel names."""
-    xs: list[np.ndarray] = []
+    x_raws: list[np.ndarray] = []
+    x_psd: list[np.ndarray] = []
+
     ys: list[np.ndarray] = []
     ch_names_ref: list[str] | None = None
 
@@ -279,16 +302,17 @@ def _trials_for_subject(
                 f"{subject}: expected {ch_names_ref[:6]}..., got {names[:6]}..."
             )
 
-        Xi, yi = _epochs_to_arrays(epochs)
-        xs.append(Xi)
+        Xraw, X_psd, yi = _epochs_to_arrays(epochs)
+        x_raws.append(Xraw)
+        x_psd.append(X_psd)
         ys.append(yi)
 
-    if not xs or ch_names_ref is None:
+    if not x_raws or ch_names_ref is None:
         raise RuntimeError(
             f"No usable epochs after preprocessing for subject {subject}"
         )
 
-    return np.concatenate(xs, axis=0), np.concatenate(ys, axis=0), ch_names_ref
+    return np.concatenate(x_raws, axis=0), np.concatenate(x_psd, axis=0), np.concatenate(ys, axis=0), ch_names_ref
 
 
 if __name__ == "__main__":
