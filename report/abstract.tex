@@ -1,16 +1,10 @@
 \begin{abstract}
-Single-trial classification of graded upper-limb movements from scalp EEG remains difficult because of low signal-to-noise ratio, spatial smearing due to volume conduction, and high inter-trial variability.
-This work systematically asks whether engineered spectral summaries and pairwise oscillatory coupling---in addition to a strong temporal convolutional baseline---raise multiclass accuracy on publicly available movement-execution EEG~\cite{ofner2017upper}.
-
-We compare a Common Spatial Patterns (CSP) plus Linear Discriminant Analysis (LDA) pipeline, an EEGNet-style convolutional model~\cite{lawhern2018eegnet}, and two dual-branch networks that fuse raw waveforms with either Welch power spectral density~(PSD) maps or magnitude features from wavelet complex cross-spectral density at motor-relevant frequencies (10 and 22\,Hz in our implementation).
-
-Training followed the repository preprocessing and optimisation scripts (\(\approx\)85/15 stratified split, subjects pooled).
-
-Held-out accuracy increased from CSP (\(\sim\)38\%), to EEGNet (\(\sim\)56\%), to PSD fusion (\(\sim\)61\%), and to connectivity attention fusion (\(\sim\)61--62\%), so multimodal fusion adds only a modest increment beyond the temporal branch.
-Connectivity topographies contrasting hand-related movement epochs with rest nevertheless retain structured spatial contrast---evidence that ancillary features carry neurophysiologically interpretable information despite the limited classification gains.
-Finally, two-dimensional t-SNE embeddings of penultimate activations show persistent class overlap across architectures, aligning with an optimisation narrative in which variance-rich temporal pathways absorb most of the learning signal.
+We compare classical Common Spatial Patterns with linear discrimination~(Block~I) against convolutional EEG decoders~(Block~II), including an EEGNet-style baseline and dual-branch models that fuse raw epochs with Welch spectra or wavelet coherence~\cite{ofner2017upper,lawhern2018eegnet}.
+All setups share pooled-stratified train--validation partitions on cue-locked upper-limb EEG.
+Quantitative scores and visuals are in Sections~\ref{sec:results}--\ref{sec:discussion}.
+Code:\linebreak {\footnotesize \url{https://github.com/MNR-MarcosOriolPagonabarraga-projects/HMI-EEGMovementClassification.git}}
 \end{abstract}
 
-\vspace{0.4em}
-\noindent\textbf{Index Terms}---EEG; motor decoding; deep learning; multimodal fusion; functional connectivity; common spatial patterns.
-\vspace{0.4em}
+\vspace{0.35em}
+\noindent\textbf{Index Terms---}EEG motor decoding; common spatial patterns; deep learning; multimodal fusion; upper-limb classification.
+\vspace{0.35em}

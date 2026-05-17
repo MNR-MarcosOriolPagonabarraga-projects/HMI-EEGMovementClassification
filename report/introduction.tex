@@ -1,23 +1,32 @@
 \section{Introduction}
 
-Decoding kinematic distinctions within a single limb from scalp electroencephalography~(EEG) is relevant for assistive robotics, prosthetic control, and neurorehabilitation brain--computer interfaces~(BCIs)~\cite{ofner2017upper}.
-At the scalp, cortical potentials are mixtures of underlying sources diluted by volume conduction; moreover, cue-locked trials exhibit low signal-to-noise ratio and stochastic latency jitter~\cite{ofner2017upper}.
+\label{sec:intro}
 
-Classical pipelines employ spatial filtering---notably Common Spatial Patterns~(CSP) combined with discriminant analysis---or band-power features tailored to \(\mu\) and \(\beta\) rhythms.
-Convolutional EEG models such as EEGNet~\cite{lawhern2018eegnet} jointly learn spectro-temporal patterns from waveform tensors and routinely outperform shallow filters on multiclass setups with sufficient data.
+Decoding multiple upper-limb movement states from scalp EEG motivates brain--computer interfaces, neurorehabilitation, and robotic assistive devices~\cite{ofner2017upper}.
+Signal quality at the scalp is limited by spatial mixing (volume conduction), low SNR, and variability between trials, which complicates multiclass decoding.
 
-\textbf{Objective.}
-Rather than benchmarking for maximum leaderboard accuracy alone, we \emph{systematically evaluate whether explicit Welch PSD summaries and pairwise wavelet connectivity features improve four-class upper-limb decoding beyond an EEGNet-style temporal encoder}.
-The analysis is grounded in the movement-execution corpus of Ofner~\emph{et al.}~\cite{ofner2017upper}, which provides controlled sustained upper-limb tasks at high temporal resolution together with ancillary documentation for event codes and sensor layouts.
+\textbf{Purpose of this work.}
+We organise the approach as two blocks applied to identical cue-locked data.
+\textbf{Block~I} is a classical \emph{CSP+LDA pipeline}: handcrafted spatial filters optimised for discriminative variance, followed by a linear Gaussian classifier~\cite{gramfort2013meg}.
 
-\textbf{Contributions.}
-The study (i)~implements a homogeneous preprocessing and splitting protocol spanning CSP+LDA~\cite{gramfort2013meg}, EEGNet, late PSD fusion~(\texttt{EEGPsdNet}), and attention-based connectivity fusion~(\texttt{EEGConnectivityNet}); (ii)~quantifies where accuracy gains saturate once a temporal convolutional pathway is competitive; (iii)~complements quantitative scores with scalp maps that contrast connectivity-derived summaries between \emph{hand movement} epochs and \emph{rest}, underscoring that engineered features preserve interpretable spatial structure even when classification margins are narrow; and (iv)~visualises latent geometry via t-SNE on pre-softmax embeddings to explain why multimodal margins remain tight.
+\textbf{Block~II} is a set of \emph{convolutional decoders}: an EEGNet-style architecture~\cite{lawhern2018eegnet} operating on raw voltage epochs together with two custom dual-branch models that concatenate or softly gate auxiliary tensors derived from Welch spectral maps and pairwise wavelet cross-spectral features.
 
-Figure~\ref{fig:grandavg} illustrates cue-locked grand averages that foreshadow multiclass overlap.
+\textbf{Contribution.}
+The comparison isolates where accuracy gains originate when moving from linear spatial prototypes to differentiable temporal receptive fields and, subsequently, multimodal fusion.
+Section~\ref{sec:methods} lays out methodology in that order~(CSP, then convolutional architectures); Section~\ref{sec:results} reports withheld accuracy and accompanying figures; Section~\ref{sec:discussion} interprets them.
+
+\textbf{Data.}
+Experiments reuse the Graz movement--execution corpus~\cite{ofner2017upper}.
+Code and preprocessing defaults are documented here:\\
+\begin{center}
+\footnotesize \url{https://github.com/MNR-MarcosOriolPagonabarraga-projects/HMI-EEGMovementClassification.git}
+\end{center}
+
+Figure~\ref{fig:grandavg} shows condition-averaged sensorimotor waveforms obtained after filtering and segmentation.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{raw_eeg_grand_average_per_class}
-  \caption{Grand-average cue-locked waveforms for the four coarse classes after the training pipeline's filtering and normalisation. Similar sensorimotor morphologies across conditions indicate that single-trial discrimination must rely on subtle differences rather than separated templates.}
+  \caption{Grand-average cue-locked EEG for four behavioural classes.}
   \label{fig:grandavg}
 \end{figure}
