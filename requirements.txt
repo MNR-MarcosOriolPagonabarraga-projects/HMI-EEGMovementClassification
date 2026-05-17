@@ -1,0 +1,5 @@
+mne
+scikit-learn
+scipy
+rich
+matplotlib
