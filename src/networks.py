@@ -116,3 +116,87 @@ class EEGPsdNet(nn.Module):
         combined = self.fusion_norm(combined)
         
         return self.classifier(combined)
+
+
+class EEGConnectivityNet(nn.Module):
+    def __init__(self, n_channels=21, n_classes=4, sfreq=128, F1=8, D=4, F2=16):
+        super(EEGConnectivityNet, self).__init__()
+        
+        # --- BRANCH 1: RAW CONVOLUTIONAL ENCODER ---
+        self.temporal_conv = nn.Sequential(
+            nn.Conv2d(1, F1, (1, sfreq // 2), padding=(0, sfreq // 4), bias=False),
+            nn.BatchNorm2d(F1)
+        )
+        self.spatial_conv = nn.Sequential(
+            nn.Conv2d(F1, D * F1, (n_channels, 1), groups=F1, bias=False),
+            nn.BatchNorm2d(D * F1),
+            nn.ELU(),
+            nn.AvgPool2d((1, 4)),
+            nn.Dropout(0.3)
+        )
+        self.separator_conv = nn.Sequential(
+            nn.Conv2d(D * F1, D * F1, (1, 16), padding=(0, 8), groups=D * F1, bias=False),
+            nn.Conv2d(D * F1, F2, (1, 1), bias=False),
+            nn.BatchNorm2d(F2),
+            nn.ELU(),
+            nn.AvgPool2d((1, 8)),
+            nn.Dropout(0.4) # Increased to limit raw branch overfitting
+        )
+        
+        # --- BRANCH 2: COMPACT CONNECTIVITY ENCODER ---
+        # Squeezing the feature dimension prevents memorizing trial-level variance
+        self.conn_encoder = nn.Sequential(
+            nn.Linear(420, 64),
+            nn.BatchNorm1d(64),
+            nn.ELU(),
+            nn.Dropout(0.5), # High dropout forces the network to rely on broad networks
+            nn.Linear(64, 32),
+            nn.BatchNorm1d(32),
+            nn.ELU()
+        )
+
+        # --- BRANCH DIMENSION EQUALIZATION ---
+        # Matches raw feature outputs (160 dimensions) down to 32 dimensions
+        self.raw_compressor = nn.Sequential(
+            nn.Linear(160, 32),
+            nn.BatchNorm1d(32),
+            nn.ELU(),
+            nn.Dropout(0.3)
+        )
+
+        # --- MULTI-MODAL ATTENTION FUSION ---
+        # Determines which branch to trust on a trial-by-trial basis
+        self.attention_gate = nn.Sequential(
+            nn.Linear(64, 2),
+            nn.Softmax(dim=1)
+        )
+        
+        self.classifier = nn.Sequential(
+            nn.Linear(32, 16),
+            nn.ELU(),
+            nn.Dropout(0.3),
+            nn.Linear(16, n_classes)
+        )
+
+    def forward(self, x_raw, x_conn):
+        # Process Raw Branch
+        x1 = self.temporal_conv(x_raw)
+        x1 = self.spatial_conv(x1)
+        x1 = self.separator_conv(x1)
+        x1 = torch.flatten(x1, 1) # Yields 160 dimensions
+        x1_compressed = self.raw_compressor(x1) # Squeezed to 32 dimensions
+        
+        # Process Connectivity Branch
+        x2 = self.conn_encoder(x_conn) # Yields 32 dimensions
+        
+        # Compute Dynamic Attention Weights
+        combined_features = torch.cat((x1_compressed, x2), dim=1) # 64 dimensions
+        attn_weights = self.attention_gate(combined_features)     # Shape: (Batch, 2)
+        
+        #  Apply Attention Weights to Blend Modalities
+        w_raw = attn_weights[:, 0].unsqueeze(1)
+        w_conn = attn_weights[:, 1].unsqueeze(1)
+        
+        fused_representation = (w_raw * x1_compressed) + (w_conn * x2)
+        
+        return self.classifier(fused_representation)

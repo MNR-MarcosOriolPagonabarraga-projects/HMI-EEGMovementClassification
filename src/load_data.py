@@ -192,3 +192,20 @@ class EEGPsdDataset(Dataset):
         raw_cropped = raw[:, :, start : start + self.crop_size]
         
         return raw_cropped, self.X_psd[idx], self.y[idx]
+
+
+class EEGConnDataset(Dataset):
+    def __init__(self, X_raw, X_conn, y):
+        # EEGNet expects a 1-depth channel dimension: (Batch, 1, Channels, Time)
+        if X_raw.ndim == 3:
+            X_raw = np.expand_dims(X_raw, axis=1)
+            
+        self.X_raw = torch.tensor(X_raw, dtype=torch.float32)
+        self.X_conn = torch.tensor(X_conn, dtype=torch.float32)
+        self.y = torch.tensor(y, dtype=torch.long)
+
+    def __len__(self):
+        return len(self.y)
+
+    def __getitem__(self, idx):
+        return self.X_raw[idx], self.X_conn[idx], self.y[idx]

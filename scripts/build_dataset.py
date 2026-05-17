@@ -24,6 +24,7 @@ from src.config import (
 )
 from src.load_data import EEGMatLoader
 from src.pipeline import EEGPreprocessor
+from src.processing import compute_connectivity_features
 
 _RUN_STEM_RE = re.compile(r"ME_S(?P<sub>\d+)_r(?P<run>\d+)\.mat$", re.IGNORECASE)
 
@@ -54,13 +55,14 @@ def main() -> None:
     # Concatenate all trial tensors (trial × channel × time)
     X_chunks: list[np.ndarray] = []
     X_psd_chunks: list[np.ndarray] = []
+    X_conn_chunks: list[np.ndarray] = []
     y_chunks: list[np.ndarray] = []
     ch_names_global: list[str] | None = None
 
     for sid in subject_ids:
         tag = _subject_folder_and_id(sid)[0].upper()
         try:
-            Xs, X_psd, ys, chs = _trials_for_subject(loader, sid, preprocessor)
+            Xs, X_psd, X_conn, ys, chs = _trials_for_subject(loader, sid, preprocessor)
         except (FileNotFoundError, RuntimeError) as exc:
             print(f"[build_dataset] skip {tag}: {exc}")
             continue
@@ -75,6 +77,7 @@ def main() -> None:
 
         X_chunks.append(Xs)
         X_psd_chunks.append(X_psd)
+        X_conn_chunks.append(X_conn)
         y_chunks.append(ys)
 
     if not X_chunks or ch_names_global is None:
@@ -82,13 +85,15 @@ def main() -> None:
 
     X = np.concatenate(X_chunks, axis=0)
     X_psd = np.concatenate(X_psd_chunks, axis=0)
+    X_conn = np.concatenate(X_conn_chunks, axis=0)
     y = np.concatenate(y_chunks, axis=0)
     counts = tuple(int((y == c).sum()) for c in range(len(CLASS_NAMES)))
     print(f"[build_dataset] pooled X{X.shape}; per-class counts {counts}")
 
-    X_train, X_test, X_train_psd, X_test_psd, y_train, y_test = train_test_split(
+    X_train, X_test, X_train_psd, X_test_psd, X_train_conn, X_test_conn, y_train, y_test = train_test_split(
         X,
         X_psd,
+        X_conn,
         y,
         test_size=TEST_SIZE,
         stratify=y,
@@ -110,6 +115,7 @@ def main() -> None:
         TRAIN_OUTPUT,
         X=X_train,
         X_psd=X_train_psd,
+        X_conn=X_train_conn,
         y=y_train,
         sfreq=loader.output_sfreq,
         ch_names=ch_names_global,
@@ -119,6 +125,7 @@ def main() -> None:
         TEST_OUTPUT,
         X=X_test,
         X_psd=X_test_psd,
+        X_conn=X_test_conn,
         y=y_test,
         sfreq=loader.output_sfreq,
         ch_names=ch_names_global,
@@ -239,8 +246,10 @@ def _epochs_to_arrays(epochs: mne.Epochs) -> tuple[np.ndarray, np.ndarray]:
     
     # Apply Log-transform (Essential for spectral feature normalization)
     X_psd = np.log10(psd_feat + 1e-10).astype(np.float32)
+
+    X_conn = compute_connectivity_features(X_norm)
     
-    return X_norm, X_psd, y
+    return X_norm, X_psd, X_conn, y
 
 
 def _write_split_npz(
@@ -248,6 +257,7 @@ def _write_split_npz(
     *,
     X: np.ndarray,
     X_psd: np.ndarray,
+    X_conn: np.ndarray,
     y: np.ndarray,
     sfreq: float,
     ch_names: list[str],
@@ -258,6 +268,7 @@ def _write_split_npz(
         path,
         X=X,
         X_psd=X_psd,
+        X_conn=X_conn,
         y=y,
         sfreq=np.array([sfreq], dtype=np.float64),
         ch_names=np.array(ch_names, dtype=object),
@@ -280,6 +291,7 @@ def _trials_for_subject(
     """All runs for one subject → stacked trial arrays and channel names."""
     x_raws: list[np.ndarray] = []
     x_psd: list[np.ndarray] = []
+    x_conn: list[np.ndarray] = []
 
     ys: list[np.ndarray] = []
     ch_names_ref: list[str] | None = None
@@ -302,9 +314,10 @@ def _trials_for_subject(
                 f"{subject}: expected {ch_names_ref[:6]}..., got {names[:6]}..."
             )
 
-        Xraw, X_psd, yi = _epochs_to_arrays(epochs)
+        Xraw, X_psd, X_conn, yi = _epochs_to_arrays(epochs)
         x_raws.append(Xraw)
         x_psd.append(X_psd)
+        x_conn.append(X_conn)
         ys.append(yi)
 
     if not x_raws or ch_names_ref is None:
@@ -312,7 +325,7 @@ def _trials_for_subject(
             f"No usable epochs after preprocessing for subject {subject}"
         )
 
-    return np.concatenate(x_raws, axis=0), np.concatenate(x_psd, axis=0), np.concatenate(ys, axis=0), ch_names_ref
+    return np.concatenate(x_raws, axis=0), np.concatenate(x_psd, axis=0), np.concatenate(x_conn, axis=0), np.concatenate(ys, axis=0), ch_names_ref
 
 
 if __name__ == "__main__":
