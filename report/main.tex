@@ -1,0 +1,43 @@
+%% Build (from this directory):
+%%   latexmk -pdf main.tex
+%%   # or: pdflatex main && bibtex main && pdflatex main && pdflatex main
+%%
+%% For official IEEE layout, install \texttt{texlive-publishers} (provides \texttt{IEEEtran.cls})
+%% and switch the document class in \texttt{main.tex} to \texttt{IEEEtran}.
+%%
+\documentclass[11pt,twocolumn,a4paper]{article}
+
+\usepackage[margin=0.72in,columnsep=0.26in]{geometry}
+
+\input{preamble}
+\input{commands}
+\graphicspath{{./img/}{../}}
+
+\begin{document}
+
+\input{metadata}
+
+\twocolumn[
+\begin{center}
+{\Large\bfseries \papertitle\par}
+\vspace{0.6em}
+{\normalsize \paperauthor\par}
+{\small \paperaffil\par}
+\vspace{1.1em}
+\end{center}
+\input{abstract}
+]
+
+\input{introduction}
+\input{methods}
+\input{results}
+\input{discussion}
+\input{conclusion}
+
+\section*{Acknowledgment}
+Scripts, notebooks, raster figures (\texttt{report/img/}), and training artefacts (\texttt{models/}, \texttt{results/}) accompany the codebase.
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}

@@ -1,0 +1,11 @@
+\section{Conclusion}
+
+We conducted a systematic evaluation of whether PSD and wavelet connectivity features improve four-class upper-limb EEG decoding beyond an EEGNet-class temporal encoder~\cite{ofner2017upper,lawhern2018eegnet}.
+
+Deep convolutional filters deliver the principal accuracy gain relative to CSP+LDA~\cite{gramfort2013meg}; PSD and attention-based connectivity fusion augment performance only modestly~(\(\approx 56\%\) to \(\approx 61\mbox{--}62\%\)).
+
+Topographic contrasts between aggregated hand movements and resting baselines~(Figure~\ref{fig:connTopo}) retain organised peri-central modulation that is only partially conveyed by softmax scores, illustrating that multimodal augmentation may preserve interpretable physiology even when discriminative increments taper off.
+
+Class-interleaved embeddings prior to softmax~(Figure~\ref{fig:tsne}) provide a geometrical analogue of the same plateau under pooled-subject validation.
+
+Future benchmarking should unify CSP and CNN preprocessing, adopt subject-independent validation, and explore regularisers that incentivise coherence pathways without weakening temporal stability.

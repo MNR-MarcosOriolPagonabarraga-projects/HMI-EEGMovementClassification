@@ -1,0 +1,67 @@
+\section{Materials and methods}
+
+\subsection{Dataset}
+We analysed publicly released \emph{movement execution} EEG from~\cite{ofner2017upper} (BNCI Horizon~2020 accession~\texttt{001-2017}; see also \texttt{docs/DatabaseDescription.pdf}).
+Healthy adults performed cue-guided sustained actions of elbow, forearm, and hand synergy families together with fixation \emph{rest}; recordings sampled 61 EEG channels at 512\,Hz with auxiliary kinematics~\cite{ofner2017upper}.
+
+Each run corresponds to an EEGLAB \texttt{ME\_Sxx\_rYY.mat} archive read by~\texttt{EEGMatLoader}.
+We retain 21 motor ribbon electrodes defined in~\texttt{src/config.py}, resample to 128\,Hz, and extract epochs from $-0.5$\,s to $+2.0$\,s relative to cue onset.
+Trials exceeding $\pm$200\,$\mu$V amplitude limits are discarded.
+
+\textbf{Aggregation to four multiclass targets.}
+Opposite movement directions collapse to symmetric families: elbow flexion/extension~\(\rightarrow\) \emph{elbow}; forearm supination/pronation~\(\rightarrow\) \emph{forearm}; hand open/close~\(\rightarrow\) \emph{hand}; \emph{rest} remains singleton (event codes enumerated in~\texttt{EVENT\_ID}).
+Chance performance is therefore 25\%.
+
+\subsection{Preprocessing and derived tensors}
+The export script~\texttt{scripts/build\_dataset.py} applies~\texttt{EEGPreprocessor} with notch filtering at line frequency, followed by zero-phase FIR band-pass filtering between 0.5 and 40\,Hz (MNE; \texttt{phase='zero'}).
+\textbf{Note:} exported tensors omit common-average re-referencing (\texttt{apply\_car=False}) to match the convolutional branch; CSP hyperparameter sweeps in~\texttt{scripts/tune\_csp\_preprocessing.py} may employ alternative band definitions and should be interpreted as exploratory rather than strictly identical preprocessing.
+
+For each surviving trial:
+\begin{itemize}
+\setlength\itemsep{0pt}
+  \item raw tensors undergo per-channel, per-trial temporal $z$-scoring prior to PSD and coherence extraction;
+  \item \textbf{PSD tensors} (\texttt{X\_psd}): Welch estimates over 3--30\,Hz;
+  \item \textbf{connectivity tensors} (\texttt{X\_conn}): log-transformed magnitude of complex Morlet cross-spectral density at 10 and 22\,Hz for upper-triangular channel pairs (\texttt{src/processing.py}), followed by dataset-wide standardisation.
+\end{itemize}
+
+Figure~\ref{fig:pipe} summarises integration of optional branches into convolutional fusion networks.
+Stratified splitting (train $\approx$\,85\%, test $\approx$\,15\%, random seed 42) preserves class proportions.
+
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{%
+\includegraphics[width=\linewidth]{pipeline}
+}
+\caption{End-to-end feature flow from continuous recordings through optional spectral and connectivity branches into convolutional classifiers.}
+\label{fig:pipe}
+\vspace{-0.45em}
+\end{figure}
+
+\subsection{Models and optimisation}
+\textbf{CSP+LDA.} Six spatial filters with logarithmic energies feed scikit-learn Linear Discriminant Analysis within an MNE/decoding CSP pipeline~\cite{gramfort2013meg}.
+
+\begin{figure}[t]
+\captionsetup{font=footnotesize}
+\centering
+\begin{subfigure}{\linewidth}\centering\includegraphics[width=\linewidth]{CSP_scatter_components}\caption{Scattergram of CSP log-energies.}\end{subfigure}\\[3pt]
+\begin{subfigure}{\linewidth}\centering\includegraphics[width=\linewidth]{CSP_marginal_first_LDA_input_per_class}\caption{Marginal density of an exemplar CSP feature.}\end{subfigure}
+\caption{Overlap of handcrafted CSP-derived features illustrates why linear separators alone achieve limited multiclass discrimination.}
+\label{fig:csp}
+\end{figure}
+
+\textbf{Convolutional baselines.}
+\textbf{EEGNet} adopts separable convolutional motifs from~\cite{lawhern2018eegnet} as implemented in~\texttt{src/networks.py}.
+
+\textbf{\texttt{EEGPsdNet}} couples the EEGNet waveform encoder with a lightweight spectral CNN on~\texttt{X\_psd}; representations are fused by vector concatenation and batch normalization before the terminal linear layer.
+
+\textbf{\texttt{EEGConnectivityNet}} compresses waveform and connectivity embeddings, applies a softmax attention gate to mix modalities, and passes the fused vector through a multilayer perceptron classifier.
+
+\textbf{Optimisation.} All deep models minimise class-weighted cross-entropy with label smoothing, optimise with AdamW (stepped learning-rate reduction on plateau), inject Gaussian augmentation noise on EEG tensors during training, and clip gradient norms; see~\texttt{scripts/train\_eeg*.py}.
+
+\subsection{t-SNE of penultimate embeddings}
+Activation vectors feeding the terminal affine layer~(pre-softmax) were extracted for withheld trials across architectures.
+We projected them using scikit-learn's \texttt{TSNE} with matched hyper-parameters to obtain comparable two-dimensional neighbourhoods.
+
+\subsection{Connectivity scalp visualisation}
+
+For qualitative neurophysiological corroboration, trial-averaged connectivity-derived quantities were interpolated to scalp coordinates to visualise contrasts between \emph{hand} movement epochs and \emph{rest}, using the Graz channel montage~\cite{ofner2017upper}.

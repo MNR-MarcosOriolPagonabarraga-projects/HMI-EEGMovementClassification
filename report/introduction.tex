@@ -1,0 +1,23 @@
+\section{Introduction}
+
+Decoding kinematic distinctions within a single limb from scalp electroencephalography~(EEG) is relevant for assistive robotics, prosthetic control, and neurorehabilitation brain--computer interfaces~(BCIs)~\cite{ofner2017upper}.
+At the scalp, cortical potentials are mixtures of underlying sources diluted by volume conduction; moreover, cue-locked trials exhibit low signal-to-noise ratio and stochastic latency jitter~\cite{ofner2017upper}.
+
+Classical pipelines employ spatial filtering---notably Common Spatial Patterns~(CSP) combined with discriminant analysis---or band-power features tailored to \(\mu\) and \(\beta\) rhythms.
+Convolutional EEG models such as EEGNet~\cite{lawhern2018eegnet} jointly learn spectro-temporal patterns from waveform tensors and routinely outperform shallow filters on multiclass setups with sufficient data.
+
+\textbf{Objective.}
+Rather than benchmarking for maximum leaderboard accuracy alone, we \emph{systematically evaluate whether explicit Welch PSD summaries and pairwise wavelet connectivity features improve four-class upper-limb decoding beyond an EEGNet-style temporal encoder}.
+The analysis is grounded in the movement-execution corpus of Ofner~\emph{et al.}~\cite{ofner2017upper}, which provides controlled sustained upper-limb tasks at high temporal resolution together with ancillary documentation for event codes and sensor layouts.
+
+\textbf{Contributions.}
+The study (i)~implements a homogeneous preprocessing and splitting protocol spanning CSP+LDA~\cite{gramfort2013meg}, EEGNet, late PSD fusion~(\texttt{EEGPsdNet}), and attention-based connectivity fusion~(\texttt{EEGConnectivityNet}); (ii)~quantifies where accuracy gains saturate once a temporal convolutional pathway is competitive; (iii)~complements quantitative scores with scalp maps that contrast connectivity-derived summaries between \emph{hand movement} epochs and \emph{rest}, underscoring that engineered features preserve interpretable spatial structure even when classification margins are narrow; and (iv)~visualises latent geometry via t-SNE on pre-softmax embeddings to explain why multimodal margins remain tight.
+
+Figure~\ref{fig:grandavg} illustrates cue-locked grand averages that foreshadow multiclass overlap.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{raw_eeg_grand_average_per_class}
+  \caption{Grand-average cue-locked waveforms for the four coarse classes after the training pipeline's filtering and normalisation. Similar sensorimotor morphologies across conditions indicate that single-trial discrimination must rely on subtle differences rather than separated templates.}
+  \label{fig:grandavg}
+\end{figure}

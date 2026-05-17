@@ -1,0 +1,20 @@
+\section{Discussion}
+
+\noindent\textit{Neurophysiological corroboration versus quantitative scores.}
+Figure~\ref{fig:connTopo} presents structured spatial contrasts between aggregate \emph{hand} movement epochs and resting baselines~\cite{ofner2017upper}, reinforcing that connectivity-derived summaries capture task-relevant physiology.
+Table~\ref{tab:main} nevertheless confirms that PSD and coherence fusion elevate accuracy only incrementally once a competitive temporal CNN is in place.
+Interpreted jointly, these observations support the view that scalar accuracy and neurophysiological readability are not interchangeable: movement--rest distinctions can remain prominent in feature space while synergy-level boundaries continue to challenge classifiers operating on scalp recordings.
+
+\noindent\textit{Temporal-branch dominance.}
+Smoothed PSD maps and log-scaled coherence tensors exhibit lower trial-to-trial variance than jitter-augmented waveforms.
+Mini-batch gradients therefore emphasise depthwise temporal receptive fields that specialise in peri-central voltage fluctuations, even when batch normalisation or softmax attention gates nominally reweight auxiliary branches.
+
+\noindent\textit{Latent entanglement.}
+Figure~\ref{fig:tsne} shows interleaved class neighbourhoods immediately prior to softmax, providing a geometrical explanation for the accuracy plateau: widening fusion layers alone does not orthogonalise class manifolds absent additional data diversity or regularisation targeted at coherence representations.
+
+\noindent\textit{Limitations.}
+\textbf{(i)~Preprocessing alignment:} exploratory CSP sweeps~\texttt{tune\_csp\_*} exploit band hypotheses that differ from the CNN export path; transparent harmonisation is prerequisite for strict CSP--CNN comparisons.
+\textbf{(ii)~Evaluation scope:} withholding trials from a mixed-subject pool overestimates reproducibility relative to leave-one-subject-out protocols recommended for assistive translation~\cite{ofner2017upper}.
+
+\noindent\textit{Future directions.}
+Modality-regularised objectives, coherence-only diagnostic models, hierarchical decoders that isolate joint identity before fine movements, subject-specific adaptation, and augmentation policies operating on embedding manifolds merit investigation.
