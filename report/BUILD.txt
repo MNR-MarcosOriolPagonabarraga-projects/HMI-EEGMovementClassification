@@ -5,6 +5,6 @@ From ``report/``:
 
   latexmk -pdf main.tex
 
-``graphicspath`` searches ``./img/`` first (grand averages, CSP diagnostics, connectivity topomaps, t-SNE) then ``../`` (e.g. confusion matrices under ``models/``).
+``graphicspath`` searches ``./img/`` first for manuscript figures~(grand-average traces, CSP plots, connectivity topomap, t-SNE) then ``../`` as fallback.
 
 Output: ``main.pdf``.
