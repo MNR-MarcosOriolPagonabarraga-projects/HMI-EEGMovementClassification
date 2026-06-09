@@ -1,0 +1,37 @@
+\documentclass[11pt,twocolumn,a4paper]{article}
+
+\usepackage[margin=0.72in,columnsep=0.26in]{geometry}
+
+\input{preamble}
+\input{commands}
+\graphicspath{{./img/}{../}}
+
+\begin{document}
+
+\input{metadata}
+
+\twocolumn[
+\begin{center}
+{\Large\bfseries \papertitle\par}
+\vspace{0.6em}
+{\normalsize \paperauthor\par}
+{\small \paperaffil\par}
+\vspace{1.1em}
+\end{center}
+\input{abstract}
+]
+
+\input{introduction}
+\input{methods}
+\input{results}
+\input{discussion}
+\input{conclusion}
+
+\section*{Acknowledgment}
+Code:\linebreak
+{\footnotesize \url{https://github.com/MNR-MarcosOriolPagonabarraga-projects/HMI-EEGMovementClassification.git}}
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}

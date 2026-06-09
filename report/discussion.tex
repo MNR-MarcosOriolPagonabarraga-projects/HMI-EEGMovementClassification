@@ -1,0 +1,26 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\textbf{Block~I versus Block~II.}
+Table~\ref{tab:main} reports narrow-band exploratory CSP near \(\sim 38\mbox{--}39\%\) withheld accuracy, broadband CSP on tensors sharing the \(\sim\)0.5\,--\,40\,Hz envelope with convolutional preprocessing at \(\sim 32\%\), and Block~II models on identical splits~\cite{gramfort2013meg,lawhern2018eegnet}.
+Convolutional receptive fields improve by \(\sim\)17\,--\,18 percentage points versus the optimised shallow CSP line and \(\sim\)24 versus broadband CSP paired to identical envelopes.
+This pattern suggests discriminative cues that exceed short CSP log-variance summaries of surface waveforms~\cite{gramfort2013meg}.
+
+\textbf{CSP preprocessing parity.}
+The CSP rows entail different contracts: exploratory fits concentrate variance inside motor-frequency hypotheses, whereas broadband CSP aligns band limiting with Block~II.
+Separately, tensor preparation here omitted common-average referencing for convolutional pipelines~\cite{gramfort2013meg}.
+Fair CSP--CNN benchmarking must therefore unify band-pass envelopes, referencing, and cropping before blaming spatial filtering deficits alone.
+
+\textbf{Multimodal fusion.}
+Welch concatenation and coherence attention each add roughly five percentage points over the EEGNet-style baseline~\cite{lawhern2018eegnet}.
+Auxiliary maps likely supply marginal complementary constraints rather than orthogonal geometry.
+
+\textbf{Neurophysiological structure versus accuracy.}
+Figure~\ref{fig:connTopo} exhibits organised peri-central contrast between trial-averaged hand-related epochs and rest~\cite{ofner2017upper} while Table~\ref{tab:main} shows only modest incremental gains from fusion.
+Interpretable connectivity structure and softmax margins are therefore not interchangeable metrics.
+
+\textbf{Embeddings and residual errors.}
+Colour intermixing in Fig.~\ref{fig:tsne} matches the numeric picture in Table~\ref{tab:main}: withheld softmax inputs from different classes remain neighbour points for every Block~II model, leaving systematic confusions among kinematically related synergies.
+
+\textbf{Generalisation scope.}
+Withholding trials from a pooled subject mix is optimistic relative to leave-one-subject-out evaluation recommended for neurotechnology translation~\cite{ofner2017upper}.
