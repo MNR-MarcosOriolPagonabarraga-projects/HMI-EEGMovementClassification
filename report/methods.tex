@@ -42,7 +42,7 @@ Six orthogonal spatial patterns provided feature vectors \(\mathbb{R}^6\) for LD
 Block~II instantiates differentiable temporal receptive fields analogous to EEGNet~\cite{lawhern2018eegnet}:
 \begin{enumerate}
 \setlength\itemsep{0pt}
-  \item \textbf{Baseline CNN} --- separable convolutional stem processing raw EEG tensors~\cite{lawhern2018eegnet}.
+  \item \textbf{Baseline CNN} --- separable convolutional stem processing filtered EEG epoch tensors~\cite{lawhern2018eegnet}.
   \item \textbf{Spectral concat fusion}~(EEGPSDNet style) --- late fusion by vector concatenation of CNN embeddings with shallow spectral CNN embeddings on Welch maps, batch-normalised prior to softmax.
   \item \textbf{Connectivity attention fusion}~(EEGConnectivityNet style) --- independent encoders squeeze waveform embeddings and coherence tensors, softmax attention mixtures modulate modality weights, lastly MLP softmax classification.
 \end{enumerate}

@@ -15,13 +15,13 @@
       Motor-band CSP after search across band hypotheses. &
       \(\sim\)36 \\
     Block~II CNN baseline~\cite{lawhern2018eegnet} &
-      Raw EEG via separable temporal convolutions~(EEGNet-class baseline). &
+      Filtered cue-locked epochs via separable temporal convolutions~(EEGNet-class baseline). &
       \(\sim\)56 \\
     Block~II CNN + PSD~(EEGPSDNet) &
-      Late fusion: raw epochs and Welch PSD maps. &
+      Late fusion: filtered time-domain epochs and Welch PSD maps. &
       \(\sim\)61 \\
     Block~II CNN + CSD attn.~(ConnNet) &
-      Raw epochs and coherence tensors with modality attention. &
+      Filtered epochs and coherence tensors with modality attention. &
       \(\sim\)61\,--\,62 \\
     \bottomrule
   \end{tabularx}

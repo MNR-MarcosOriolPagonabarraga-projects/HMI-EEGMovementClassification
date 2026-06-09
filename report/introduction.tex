@@ -9,7 +9,7 @@ Signal quality at the scalp is limited by spatial mixing (volume conduction), lo
 We organise the approach as two blocks applied to identical cue-locked data.
 \textbf{Block~I} is a classical \emph{CSP+LDA pipeline}: handcrafted spatial filters optimised for discriminative variance, followed by a linear Gaussian classifier~\cite{gramfort2013meg}.
 
-\textbf{Block~II} is a set of \emph{convolutional decoders}: an EEGNet-style architecture~\cite{lawhern2018eegnet} operating on raw voltage epochs together with two custom dual-branch models that concatenate or softly gate auxiliary tensors derived from Welch spectral maps and pairwise wavelet cross-spectral features.
+\textbf{Block~II} is a set of \emph{convolutional decoders}: an EEGNet-style architecture~\cite{lawhern2018eegnet} operating on filtered, cue-locked voltage epochs~(the common preprocessing pipeline of Section~\ref{sec:dataprep}) together with two custom dual-branch models that concatenate or softly gate auxiliary tensors derived from Welch spectral maps and pairwise wavelet cross-spectral features.
 
 \textbf{Contribution.}
 The comparison isolates where accuracy gains originate when moving from linear spatial prototypes to differentiable temporal receptive fields and, subsequently, multimodal fusion.
@@ -23,7 +23,7 @@ Figure~\ref{fig:grandavg} shows condition-averaged sensorimotor waveforms obtain
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{raw_eeg_grand_average_per_class}
-  \caption{Grand-average cue-locked EEG for four behavioural classes.}
+  \includegraphics[width=\linewidth]{filtered_eeg_grand_average_per_class}
+  \caption{Grand-average cue-locked EEG waveforms after preprocessing~(filtering and segmentation) for four behavioural classes.}
   \label{fig:grandavg}
 \end{figure}
