@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
-from src.utils import load_npz_split, plot_history
+from src.utils import load_npz_split, plot_history, plot_and_save_latent_space, extract_dl_features
 from src.load_data import EEGPsdDataset
 from src.networks import EEGPsdNet
 
@@ -47,6 +47,21 @@ def main():
         plt.close(fig)
 
     save_confusion_matrix(all_labels, all_preds, out_dir)
+
+    print("\n[Artifact Storage] Generating t-SNE latent space visualization...")
+    # 1. Load the best weights
+    model.load_state_dict(torch.load(out_dir / "EEGPsd.pth")) # or "EEGPsd.pth"
+    
+    # 2. Extract features (set is_dual_branch=True!)
+    features, labels = extract_dl_features(model, test_loader, device, is_dual_branch=True)
+    
+    plot_and_save_latent_space(
+        features=features, 
+        labels=labels, 
+        title="Dual-Branch Latent Space (Pre-decision)", 
+        save_path=out_dir / "TSNE_DualBranch_Latent_Space.png", 
+        is_csp=False
+    )
 
     print(f"\n[Artifact Storage] All training assets successfully saved to: {out_dir}/")
 

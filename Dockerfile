@@ -1,4 +1,4 @@
-FROM ml_base:latest
+FROM mltrain:latest
 
 WORKDIR /app
 

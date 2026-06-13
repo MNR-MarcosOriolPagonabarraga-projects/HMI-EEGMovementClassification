@@ -10,7 +10,7 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
 from src.networks import EEGConnectivityNet
-from src.utils import plot_history
+from src.utils import plot_history, plot_and_save_latent_space, extract_dl_features
 from src.load_data import EEGConnDataset
 
 
@@ -53,6 +53,21 @@ def main():
 
     # Save the normalized confusion matrix
     save_confusion_matrix(all_labels, all_preds, out_dir)
+
+    print("\n[Artifact Storage] Generating t-SNE latent space visualization...")
+    # 1. Load the best weights
+    model.load_state_dict(torch.load(out_dir / "best_dual_branch.pth")) # or "EEGPsd.pth"
+    
+    # 2. Extract features (set is_dual_branch=True!)
+    features, labels = extract_dl_features(model, test_loader, device, is_dual_branch=True)
+    
+    plot_and_save_latent_space(
+        features=features, 
+        labels=labels, 
+        title="Dual-Branch Latent Space (Pre-decision)", 
+        save_path=out_dir / "TSNE_DualBranch_Latent_Space.png", 
+        is_csp=False
+    )
     
     print(f"\nTraining Complete. All assets and peak weights saved to {out_dir}/")
 

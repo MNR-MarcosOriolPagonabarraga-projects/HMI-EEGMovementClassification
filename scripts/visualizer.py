@@ -20,7 +20,7 @@ class UnifiedEEGVisualizer(QMainWindow):
         self.setWindowTitle("NeuroPipeline: Unified BCI Visualizer")
         self.resize(1300, 800) 
         
-        self.data_root = "data/original"
+        self.data_root = "data/raw"
         self.loader = EEGMatLoader(data_root=self.data_root, channels=MOTOR_CHANNELS)
         self.raw = None
         self.current_plot_widget = None

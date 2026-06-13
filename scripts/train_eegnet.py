@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
-from src.utils import load_npz_split, plot_history
+from src.utils import load_npz_split, plot_history, plot_and_save_latent_space, extract_dl_features
 from src.networks import EEGNet
 
 train_dataset = "data/processed/dataset_train.npz"
@@ -46,6 +46,21 @@ def main():
         plt.close(fig)
 
     save_confusion_matrix(all_labels, all_preds, out_dir)
+
+    print("\n[Artifact Storage] Generating t-SNE latent space visualization...")
+    # 1. Load the best weights we just saved
+    model.load_state_dict(torch.load(out_dir / "EEGNet.pth"))
+    
+    # 2. Extract features and plot
+    features, labels = extract_dl_features(model, test_loader, device, is_dual_branch=False)
+    
+    plot_and_save_latent_space(
+        features=features, 
+        labels=labels, 
+        title="EEGNet Latent Space (Pre-decision)", 
+        save_path=out_dir / "TSNE_EEGNet_Latent_Space.png", 
+        is_csp=False
+    )
 
     print(f"\n[Artifact Storage] All training assets successfully saved to: {out_dir}/")
 

@@ -1,0 +1,106 @@
+digraph G {
+    // Global layout settings for a modern, crisp tech aesthetic
+    rankdir=TB;
+    splines=true;
+    nodesep=0.4;
+    ranksep=0.4;
+    bgcolor="white";
+    
+    // Default node attributes
+    node [
+        fontname="Helvetica,Arial,sans-serif",
+        fontsize=10,
+        shape=box,
+        style="filled,rounded",
+        fillcolor="#F8F9FA",
+        color="#DEE2E6",
+        penwidth=1.5,
+        margin="0.2,0.1"
+    ];
+    
+    // Default edge attributes
+    edge [
+        fontname="Helvetica,Arial,sans-serif",
+        fontsize=9,
+        color="#6C757D",
+        penwidth=1.2,
+        arrowsize=0.8
+    ];
+
+    // --- 1. Shared Preprocessing ---
+    subgraph cluster_preprocessing {
+        label = "Data & Preprocessing";
+        fontname = "Helvetica,Arial,sans-serif;bold";
+        fontsize = 11;
+        fontcolor = "#212529";
+        color = "#CED4DA";
+        style = "dashed,rounded";
+        
+        D [label="Preprocessed epoch windows", shape=diamond, style="filled", fillcolor="#FFF3CD", color="#FFEBAA"];
+        
+        D;
+    }
+
+    // --- 2. Feature Extraction ---
+    E [label="Temporal Tensor\nNormalized Epochs", fillcolor="#E8F0FE", color="#AECBFA"];
+    F [label="Spectral Maps\nWelch PSD (3–30 Hz)", fillcolor="#E8F0FE", color="#AECBFA"];
+    G [label="Connectivity Maps\nMorlet (10 Hz & 22 Hz)", fillcolor="#E8F0FE", color="#AECBFA"];
+
+    D -> E [label=" Primary"];
+    D -> F [label=" Auxiliary"];
+    D -> G [label=" Auxiliary"];
+
+    // --- 3. Block I: Classical Baseline ---
+    subgraph cluster_block1 {
+        label = "Block I: Classical Baseline";
+        fontname = "Helvetica,Arial,sans-serif;bold";
+        fontsize = 11;
+        color = "#FADBD8";
+        style = "filled";
+        fillcolor="#FDEDEC";
+        
+        H [label="Common Spatial Pattern\n(6 Components)", fillcolor="#FFFFFF"];
+        I [label="Linear Discriminant Analysis", fillcolor="#FFFFFF"];
+        
+        H -> I;
+    }
+    E -> H;
+
+    // --- 4. Block II: Deep Learning ---
+    subgraph cluster_block2 {
+        label = "Block II: Convolutional Neural Networks";
+        fontname = "Helvetica,Arial,sans-serif;bold";
+        fontsize = 11;
+        color = "#D4EFDF";
+        style = "filled";
+        fillcolor="#EAF2F8";
+        
+        J [label="EEGNet\n(Temporal Only)", fillcolor="#FFFFFF"];
+        K [label="EEGPsdNet\n(Late Concat Fusion)", fillcolor="#FFFFFF"];
+        L [label="EEGConnNet\n(Attention Fusion)", fillcolor="#FFFFFF"];
+    }
+    
+    E -> J;
+    E -> K;
+    E -> L;
+    
+    F -> K [style="dashed", label="Soft Gating"];
+    G -> L [style="dashed", label="Soft Gating"];
+
+    // --- 5. Output ---
+    M [
+        label="Predict\n(Elbow, Hand,\n Forearm, Rest)", 
+        shape=doublecircle, 
+        fillcolor="#D4EFDF", 
+        color="#A9DFBF", 
+        style="filled",
+        fixedsize=true,
+        width=1.4
+    ];
+
+    // Balanced links to target center output
+    I -> M;
+    J -> M;
+    K -> M;
+    L -> M;
+}

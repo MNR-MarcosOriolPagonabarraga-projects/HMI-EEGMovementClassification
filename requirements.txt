@@ -3,3 +3,5 @@ scikit-learn
 scipy
 rich
 matplotlib
+searborn
+torchinfo
