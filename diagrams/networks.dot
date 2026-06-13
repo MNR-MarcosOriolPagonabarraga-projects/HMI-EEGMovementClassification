@@ -1,0 +1,124 @@
+digraph NetworkArchitectures {
+    // Global layout settings
+    pad="0.1,0.1";
+    rankdir=TB;
+    splines=spline;
+    nodesep=1.0;  // Significantly widened horizontal gaps between models
+    ranksep=0.6;  // Global layer separation
+    fontname="Helvetica, Arial, sans-serif";
+    
+    // Journal style: Perfect square-ish fixed nodes so text never stretches the box
+    node [
+        fontname="Helvetica, Arial, sans-serif", 
+        fontsize=10, 
+        shape=rect, 
+        style="rounded,filled", 
+        fillcolor="#FFFFFF", 
+        color="#BDBDBD", 
+        penwidth=1.2, 
+        fixedsize=shape, // Forces nodes to respect explicit bounds
+        width=2,       // Uniform professional width
+        height=0.6       // Uniform professional height
+    ];
+    
+    edge [
+        fontname="Helvetica, Arial, sans-serif", 
+        fontsize=9, 
+        fontcolor="#616161",
+        color="#757575", 
+        penwidth=1.2, 
+        arrowsize=0.6
+    ];
+
+    // ==========================================
+    // BLOCK 1: EEGNet (Baseline)
+    // ==========================================
+    subgraph cluster_eegnet {
+        label = "1. EEGNet (Temporal Baseline)";
+        fontsize = 12;
+        fontname = "Helvetica-Bold";
+        style = "rounded"; 
+        color = "#E0E0E0";
+        penwidth = 1.5;
+        margin = 30;       // Spacious local container padding
+        ranksep = 0.8;     // Pushes nodes vertically apart independently
+
+        e_in [label="Time-Domain Epoch\n(Batch, 1, 21, Time)", fillcolor="#E3F2FD", color="#90CAF9", height=0.7];
+        e_tconv [label="Temporal Conv\n(Bandpass Filter)"];
+        e_sconv [label="Depthwise Spatial Conv\n(Spatial Filter)"];
+        e_sep [label="Separable Conv\n(Temporal Summary)"];
+        e_flat [label="Flatten Feature Map"];
+        e_out [label="Linear Classifier\n(Softmax)", fillcolor="#E8F5E9", color="#A5D6A7"];
+
+        e_in -> e_tconv -> e_sconv -> e_sep -> e_flat -> e_out;
+    }
+
+    // ==========================================
+    // BLOCK 2: EEGPsdNet (Late Fusion)
+    // ==========================================
+    subgraph cluster_psdnet {
+        label = "2. EEGPsdNet (Spectral Fusion)";
+        fontsize = 12;
+        fontname = "Helvetica-Bold";
+        style = "rounded";
+        color = "#E0E0E0";
+        penwidth = 1.5;
+        margin = 30;
+        ranksep = 0.7;
+
+        p_in_raw [label="Time-Domain Epoch", fillcolor="#E3F2FD", color="#90CAF9"];
+        p_in_psd [label="Welch PSD Maps\n(Batch, 1, 21, 28)", fillcolor="#F3E5F5", color="#CE93D8", height=0.7];
+        
+        p_raw_enc [label="EEGNet Conv Stem\n(Temp+Spatial+Sep)", height=0.7];
+        p_psd_enc [label="Spectral + Spatial\nConvolutions", height=0.7];
+        
+        p_concat [label="Concatenation\n+\nBatchNorm1d", fillcolor="#FFF3E0", color="#FFCC80"];
+        p_out [label="Linear Classifier\n(Softmax)", fillcolor="#E8F5E9", color="#A5D6A7"];
+
+        p_in_raw -> p_raw_enc;
+        p_in_psd -> p_psd_enc;
+        p_raw_enc -> p_concat [label=" 128 dims"];
+        p_psd_enc -> p_concat [label=" 112 dims"];
+        p_concat -> p_out;
+    }
+
+    // ==========================================
+    // BLOCK 3: EEGConnNet (Attention Fusion)
+    // ==========================================
+    subgraph cluster_connnet {
+        label = "3. EEGConnNet (Connectivity Fusion)";
+        fontsize = 12;
+        fontname = "Helvetica-Bold";
+        style = "rounded";
+        color = "#E0E0E0";
+        penwidth = 1.5;
+        margin = 30;
+        ranksep = 0.6;
+
+        c_in_raw [label="Time-Domain Epoch", fillcolor="#E3F2FD", color="#90CAF9"];
+        c_in_conn [label="Connectivity Matrix\n(420 Pairs)", fillcolor="#F3E5F5", color="#CE93D8", height=0.7];
+        
+        c_raw_enc [label="EEGNet Conv Stem"];
+        c_raw_comp [label="Temporal Compressor\n(Linear 128 → 32)", height=0.7];
+        
+        c_conn_enc [label="Connectivity Encoder\n(MLP 420 → 64 → 32)", height=0.7];
+        
+        c_attn [label="Dynamic Attention Gate\n(Softmax)", fillcolor="#FFF3E0", color="#FFCC80"];
+        c_fuse [label="Weighted Fusion\n(Element-wise Sum)", fillcolor="#FFF3E0", color="#FFCC80"];
+        
+        c_out [label="MLP Classifier\n(Softmax)", fillcolor="#E8F5E9", color="#A5D6A7"];
+
+        c_in_raw -> c_raw_enc -> c_raw_comp;
+        c_in_conn -> c_conn_enc;
+        
+        // Symmetrical routing for attention hooks
+        c_raw_comp -> c_attn [dir=none, style=dotted, color="#9E9E9E"];
+        c_conn_enc -> c_attn [dir=none, style=dotted, color="#9E9E9E"];
+        
+        c_raw_comp -> c_fuse [label="  x w_temp"];
+        c_conn_enc -> c_fuse [label="  x w_conn"];
+        c_attn -> c_fuse [style=dashed, label=" weights", color="#F57C00", fontcolor="#F57C00"];
+        
+        c_fuse -> c_out;
+    }
+}
