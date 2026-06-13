@@ -85,12 +85,12 @@ def _parse_run_stem(stem: str) -> tuple[int, int] | None:
     return int(m.group("sub")), int(m.group("run"))
 
 
-def _discover_subject_ids(original_root: Path) -> list[int]:
+def _discover_subject_ids(raw_root: Path) -> list[int]:
     ids: list[int] = []
-    if not original_root.is_dir():
-        raise FileNotFoundError(f"Expected raw data directory at {original_root}")
+    if not raw_root.is_dir():
+        raise FileNotFoundError(f"Expected raw data directory at {raw_root}")
 
-    for d in sorted(original_root.iterdir()):
+    for d in sorted(raw_root.iterdir()):
         if not d.is_dir():
             continue
         if not any(d.glob("ME_*.mat")):
@@ -103,7 +103,7 @@ def _discover_subject_ids(original_root: Path) -> list[int]:
 
     ids = sorted(set(ids))
     if not ids:
-        raise FileNotFoundError(f"No subject folders with ME_*.mat under {original_root}")
+        raise FileNotFoundError(f"No subject folders with ME_*.mat under {raw_root}")
     return ids
 
 

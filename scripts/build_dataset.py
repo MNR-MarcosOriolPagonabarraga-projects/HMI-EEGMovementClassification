@@ -20,7 +20,8 @@ from src.config import (
     TEST_SIZE,
     TRAIN_OUTPUT,
     TRAIN_SIZE,
-    MOTOR_CHANNELS
+    MOTOR_CHANNELS,
+    REST_DELAY
 )
 from src.load_data import EEGMatLoader
 from src.pipeline import EEGPreprocessor
@@ -138,15 +139,15 @@ def main() -> None:
     )
 
 
-def _discover_subject_ids(original_root: Path) -> list[int]:
-    """Subject integer ids under ``original_root`` that contain at least one ``ME_*.mat``."""
+def _discover_subject_ids(raw_root: Path) -> list[int]:
+    """Subject integer ids under ``raw_root`` that contain at least one ``ME_*.mat``."""
     ids: list[int] = []
-    if not original_root.is_dir():
+    if not raw_root.is_dir():
         raise FileNotFoundError(
-            f"Expected raw data directory at {original_root} (does not exist)."
+            f"Expected raw data directory at {raw_root} (does not exist)."
         )
 
-    for d in sorted(original_root.iterdir()):
+    for d in sorted(raw_root.iterdir()):
         if not d.is_dir():
             continue
         if not any(d.glob("ME_*.mat")):
@@ -160,7 +161,7 @@ def _discover_subject_ids(original_root: Path) -> list[int]:
     ids = sorted(set(ids))
     if not ids:
         raise FileNotFoundError(
-            f"No subject folders with ME_*.mat under {original_root}"
+            f"No subject folders with ME_*.mat under {raw_root}"
         )
     return ids
 
@@ -203,8 +204,36 @@ def _run_indices_for_subject(loader: EEGMatLoader, subject: str | int) -> list[i
     return sorted(set(runs))
 
 
+def _add_rest_delay(
+    events: np.ndarray, 
+    sfreq: float, 
+    delay_s: float = 1.0
+) -> np.ndarray:
+    """
+    Shifts the onset of the 'rest' class by `delay_s` seconds to bypass 
+    the visual P300 evoked potential.
+    """
+    events_shifted = events.copy()
+    offset_samples = int(delay_s * sfreq)
+    
+    # Based on your EVENT_ID dict, "1542" (rest) maps to integer 3
+    rest_id = 3 
+    
+    mask = events_shifted[:, 2] == rest_id
+    events_shifted[mask, 0] += offset_samples
+    
+    return events_shifted
+
 def _cue_locked_epochs(raw: mne.io.BaseRaw) -> mne.Epochs:
     events, event_id_sel = mne.events_from_annotations(raw, event_id=EVENT_ID)
+    
+    # Apply 1s shift to rest events to avoid p300 response
+    events = _add_rest_delay(
+        events=events,
+        sfreq=raw.info["sfreq"],
+        delay_s=REST_DELAY
+    )
+    
     reject = dict(eeg=REJECT_EEG_UV * 1e-6)
     epochs = mne.Epochs(
         raw,

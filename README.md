@@ -68,14 +68,14 @@ The report argues that **multimodal fusion** buys most of its gain over the CNN 
 
 ```
 ├── data/
-│   ├── original/          # Place downloaded Graz .mat runs here (gitignored)
+│   ├── raw/          # Place downloaded Graz .mat runs here (gitignored)
 │   └── processed/         # dataset_train.npz, dataset_test.npz from build_dataset (gitignored)
 ├── docs/                  # Dataset notes / documentation PDFs
 ├── notebooks/             # Exploratory workflows (CSP, PSD net, connectivity, viz)
 ├── report/                # LaTeX paper (main.tex, sections, bibliography, img/)
 ├── scripts/
 │   ├── build_dataset.py   # End-to-end .mat → stratified .npz (+ PSD & connectivity tensors)
-│   ├── visualizer.py      # PyQt6 desktop explorer for Graz `.mat` files under data/original/
+│   ├── visualizer.py      # PyQt6 desktop explorer for Graz `.mat` files under data/raw/
 │   ├── train_csp.py       # Block I training / evaluation
 │   ├── tune_csp_preprocessing.py
 │   ├── train_eegnet.py    # Block II baseline
@@ -139,7 +139,7 @@ pip install PyQt6
 
 ### 3. Obtain the EEG data
 
-Download the **movement execution** Graz dataset (**001-2017**) from the BNCI Horizon 2020 portal and place the subject folders under `data/original/` so runs look like `data/original/S1/ME_S01_r01.mat`, etc. (see `docs/` for dataset documentation).
+Download the **movement execution** Graz dataset (**001-2017**) from the BNCI Horizon 2020 portal and place the subject folders under `data/raw/` so runs look like `data/raw/S1/ME_S01_r01.mat`, etc. (see `docs/` for dataset documentation).
 
 ### 4. Build processed tensors
 
@@ -186,4 +186,4 @@ latexmk -pdf main.tex    # or: make   (runs the same)
 
 ## Authors
 
-Raid Huoms, Marcos Oriol, Fernando Sala-Vivé, Tony Tenev — see `report/metadata.tex` for manuscript titling.
+Raid Huoms, Marcos Oriol, Fernando Sala-Vivé, Tony Tenev

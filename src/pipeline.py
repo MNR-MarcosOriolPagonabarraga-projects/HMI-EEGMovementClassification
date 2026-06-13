@@ -20,7 +20,7 @@ class EEGPreprocessor:
         self.resample_freq = resample_freq
 
     def process(self, raw):
-        # Always work on a copy to preserve the original data
+        # Always work on a copy to preserve the raw data
         raw_proc = raw.copy()
         
         # 1. Notch Filter (Remove powerline noise)

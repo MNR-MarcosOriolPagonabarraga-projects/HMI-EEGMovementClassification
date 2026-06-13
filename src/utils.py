@@ -2,6 +2,9 @@ import mne
 import numpy as np
 from scipy.io.matlab import mat_struct
 import matplotlib.pyplot as plt
+import torch
+from sklearn.manifold import TSNE
+from src.config import CLASS_NAMES
 
 
 def _chan_label(ch: mat_struct) -> str:
@@ -135,3 +138,80 @@ def plot_history(history):
     fig = plt.gcf()
 
     return fig
+
+def extract_dl_features(model, data_loader, device, is_dual_branch=False):
+    """Extracts pre-softmax features using a forward hook on the final linear layer."""
+    features = []
+    labels_list = [] 
+    
+    # Locate the final linear layer dynamically (assumes model.classifier exists)
+    # If your classifier is nn.Sequential(nn.Flatten(), nn.Linear()), this grabs the Linear layer.
+    final_layer = None
+    for module in model.modules():
+        if isinstance(module, torch.nn.Linear):
+            final_layer = module
+            
+    if final_layer is None:
+        raise ValueError("Could not find an nn.Linear layer in the model to hook into.")
+
+    # Define the hook to grab the input to the linear layer (the latent space)
+    def hook_fn(module, input, output):
+        features.append(input[0].detach().cpu().numpy())
+
+    hook = final_layer.register_forward_hook(hook_fn)
+    model.eval()
+
+    with torch.no_grad():
+        for batch in data_loader:
+            if is_dual_branch:
+                x1, x2, y = batch[0].to(device), batch[1].to(device), batch[2].to(device)
+                model(x1, x2)
+            else:
+                x, y = batch[0].to(device), batch[1].to(device)
+                model(x)
+            labels_list.extend(y.cpu().numpy())
+
+    hook.remove() # Clean up the hook
+    return np.concatenate(features, axis=0), np.array(labels_list)
+
+
+def plot_and_save_latent_space(features, labels, title, save_path, is_csp=False):
+    """Generates a highly styled, minimalistic journal-quality scatter plot."""
+    if is_csp:
+        # CSP is already spatial, just take the first two components
+        Z_2d = features[:, :2]
+        x_label, y_label = "CSP Component 1", "CSP Component 2"
+    else:
+        # Deep learning models need t-SNE dimensionality reduction
+        print(f"    Running t-SNE on feature space of shape {features.shape}...")
+        tsne = TSNE(n_components=2, init='pca', learning_rate='auto', random_state=42)
+        Z_2d = tsne.fit_transform(features)
+        x_label, y_label = "t-SNE Dimension 1", "t-SNE Dimension 2"
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    scientific_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+
+    for k, class_name in enumerate(CLASS_NAMES):
+        mask = (labels == k)
+        ax.scatter(
+            Z_2d[mask, 0], Z_2d[mask, 1],
+            s=25, alpha=0.65, c=[scientific_colors[k]], 
+            label=class_name, edgecolors="none"
+        )
+
+    # Minimalist Styling
+    ax.set_title(title, fontsize=12, fontweight='medium', pad=12)
+    ax.set_xlabel(x_label, fontsize=10)
+    ax.set_ylabel(y_label, fontsize=10)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    ax.legend(loc='best', frameon=False, fontsize=10)
+    
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    print(f"    Saved latent visualization to {save_path}")

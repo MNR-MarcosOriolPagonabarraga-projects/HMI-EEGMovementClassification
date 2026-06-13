@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 class EEGNet(nn.Module):
     def __init__(self, n_channels=21, n_classes=4, sfreq=128, 
@@ -36,10 +35,10 @@ class EEGNet(nn.Module):
         )
         
         # Classifier
-        # With 321 samples, after 4x and 8x pooling (32 total), we have ~10 points left
+        # With 257 samples, after 4x and 8x pooling, we have ~8 points left
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(F2 * 10, n_classes) 
+            nn.Linear(F2 * 8, n_classes) 
         )
 
     def forward(self, x):
@@ -158,7 +157,7 @@ class EEGConnectivityNet(nn.Module):
         # --- BRANCH DIMENSION EQUALIZATION ---
         # Matches raw feature outputs (160 dimensions) down to 32 dimensions
         self.raw_compressor = nn.Sequential(
-            nn.Linear(160, 32),
+            nn.Linear(128, 32),
             nn.BatchNorm1d(32),
             nn.ELU(),
             nn.Dropout(0.3)

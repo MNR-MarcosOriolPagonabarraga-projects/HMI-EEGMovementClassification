@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="597pt" height="488pt" viewBox="0.00 0.00 597.00 488.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 484.4)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-484.4 593.14,-484.4 593.14,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_preprocessing</title>
+<path fill="white" stroke="#ced4da" stroke-dasharray="5,2" d="M230,-382.4C230,-382.4 516,-382.4 516,-382.4 522,-382.4 528,-388.4 528,-394.4 528,-394.4 528,-460.4 528,-460.4 528,-466.4 522,-472.4 516,-472.4 516,-472.4 230,-472.4 230,-472.4 224,-472.4 218,-466.4 218,-460.4 218,-460.4 218,-394.4 218,-394.4 218,-388.4 224,-382.4 230,-382.4"/>
+<text xml:space="preserve" text-anchor="middle" x="373" y="-458.5" font-family="Helvetica,Arial,sans-serif;bold" font-size="11.00" fill="#212529">Data &amp; Preprocessing</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_block1</title>
+<polygon fill="#fdedec" stroke="#fadbd8" points="8,-132.8 8,-276.4 172,-276.4 172,-132.8 8,-132.8"/>
+<text xml:space="preserve" text-anchor="middle" x="90" y="-262.5" font-family="Helvetica,Arial,sans-serif;bold" font-size="11.00">Block I: Classical Baseline</text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_block2</title>
+<polygon fill="#eaf2f8" stroke="#d4efdf" points="180,-200.8 180,-276.4 566,-276.4 566,-200.8 180,-200.8"/>
+<text xml:space="preserve" text-anchor="middle" x="373" y="-262.5" font-family="Helvetica,Arial,sans-serif;bold" font-size="11.00">Block II: Convolutional Neural Networks</text>
+</g>
+<!-- D -->
+<g id="node1" class="node">
+<title>D</title>
+<polygon fill="#fff3cd" stroke="#ffebaa" stroke-width="1.5" points="373,-443.2 226.45,-416.8 373,-390.4 519.55,-416.8 373,-443.2"/>
+<text xml:space="preserve" text-anchor="middle" x="373" y="-413.8" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Preprocessed epoch windows</text>
+</g>
+<!-- E -->
+<g id="node2" class="node">
+<title>E</title>
+<path fill="#e8f0fe" stroke="#aecbfa" stroke-width="1.5" d="M270.97,-348.6C270.97,-348.6 187.03,-348.6 187.03,-348.6 181.03,-348.6 175.03,-342.6 175.03,-336.6 175.03,-336.6 175.03,-322.2 175.03,-322.2 175.03,-316.2 181.03,-310.2 187.03,-310.2 187.03,-310.2 270.97,-310.2 270.97,-310.2 276.97,-310.2 282.97,-316.2 282.97,-322.2 282.97,-322.2 282.97,-336.6 282.97,-336.6 282.97,-342.6 276.97,-348.6 270.97,-348.6"/>
+<text xml:space="preserve" text-anchor="middle" x="229" y="-332.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Temporal Tensor</text>
+<text xml:space="preserve" text-anchor="middle" x="229" y="-320.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Normalized Epochs</text>
+</g>
+<!-- D&#45;&gt;E -->
+<g id="edge1" class="edge">
+<title>D-&gt;E</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M339.24,-395.78C318.16,-383.27 290.91,-367.12 268.78,-353.99"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="270.45,-351.73 262.14,-350.05 267.59,-356.54 270.45,-351.73"/>
+<text xml:space="preserve" text-anchor="middle" x="316.62" y="-366.3" font-family="Helvetica,Arial,sans-serif" font-size="9.00"> Primary</text>
+</g>
+<!-- F -->
+<g id="node3" class="node">
+<title>F</title>
+<path fill="#e8f0fe" stroke="#aecbfa" stroke-width="1.5" d="M421.78,-348.6C421.78,-348.6 324.22,-348.6 324.22,-348.6 318.22,-348.6 312.22,-342.6 312.22,-336.6 312.22,-336.6 312.22,-322.2 312.22,-322.2 312.22,-316.2 318.22,-310.2 324.22,-310.2 324.22,-310.2 421.78,-310.2 421.78,-310.2 427.78,-310.2 433.78,-316.2 433.78,-322.2 433.78,-322.2 433.78,-336.6 433.78,-336.6 433.78,-342.6 427.78,-348.6 421.78,-348.6"/>
+<text xml:space="preserve" text-anchor="middle" x="373" y="-332.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Spectral Maps</text>
+<text xml:space="preserve" text-anchor="middle" x="373" y="-320.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Welch PSD (3–30 Hz)</text>
+</g>
+<!-- D&#45;&gt;F -->
+<g id="edge2" class="edge">
+<title>D-&gt;F</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M373,-389.71C373,-380.03 373,-368.99 373,-359.09"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="375.8,-359.1 373,-351.1 370.2,-359.1 375.8,-359.1"/>
+<text xml:space="preserve" text-anchor="middle" x="391.37" y="-366.3" font-family="Helvetica,Arial,sans-serif" font-size="9.00"> Auxiliary</text>
+</g>
+<!-- G -->
+<g id="node4" class="node">
+<title>G</title>
+<path fill="#e8f0fe" stroke="#aecbfa" stroke-width="1.5" d="M577.14,-348.6C577.14,-348.6 474.86,-348.6 474.86,-348.6 468.86,-348.6 462.86,-342.6 462.86,-336.6 462.86,-336.6 462.86,-322.2 462.86,-322.2 462.86,-316.2 468.86,-310.2 474.86,-310.2 474.86,-310.2 577.14,-310.2 577.14,-310.2 583.14,-310.2 589.14,-316.2 589.14,-322.2 589.14,-322.2 589.14,-336.6 589.14,-336.6 589.14,-342.6 583.14,-348.6 577.14,-348.6"/>
+<text xml:space="preserve" text-anchor="middle" x="526" y="-332.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Connectivity Maps</text>
+<text xml:space="preserve" text-anchor="middle" x="526" y="-320.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Morlet (10 Hz &amp; 22 Hz)</text>
+</g>
+<!-- D&#45;&gt;G -->
+<g id="edge3" class="edge">
+<title>D-&gt;G</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M408.1,-396.21C430.57,-383.66 459.87,-367.31 483.63,-354.05"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="484.91,-356.54 490.53,-350.2 482.18,-351.65 484.91,-356.54"/>
+<text xml:space="preserve" text-anchor="middle" x="481.58" y="-366.3" font-family="Helvetica,Arial,sans-serif" font-size="9.00"> Auxiliary</text>
+</g>
+<!-- H -->
+<g id="node5" class="node">
+<title>H</title>
+<path fill="#ffffff" stroke="#dee2e6" stroke-width="1.5" d="M144.56,-247.2C144.56,-247.2 41.44,-247.2 41.44,-247.2 35.44,-247.2 29.44,-241.2 29.44,-235.2 29.44,-235.2 29.44,-220.8 29.44,-220.8 29.44,-214.8 35.44,-208.8 41.44,-208.8 41.44,-208.8 144.56,-208.8 144.56,-208.8 150.56,-208.8 156.56,-214.8 156.56,-220.8 156.56,-220.8 156.56,-235.2 156.56,-235.2 156.56,-241.2 150.56,-247.2 144.56,-247.2"/>
+<text xml:space="preserve" text-anchor="middle" x="93" y="-231" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Common Spatial Pattern</text>
+<text xml:space="preserve" text-anchor="middle" x="93" y="-219" font-family="Helvetica,Arial,sans-serif" font-size="10.00">(6 Components)</text>
+</g>
+<!-- E&#45;&gt;H -->
+<g id="edge5" class="edge">
+<title>E-&gt;H</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M203.1,-309.47C181.36,-293.58 150.15,-270.77 126.51,-253.49"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="128.38,-251.39 120.27,-248.93 125.08,-255.91 128.38,-251.39"/>
+</g>
+<!-- J -->
+<g id="node7" class="node">
+<title>J</title>
+<path fill="#ffffff" stroke="#dee2e6" stroke-width="1.5" d="M272.42,-247.2C272.42,-247.2 199.58,-247.2 199.58,-247.2 193.58,-247.2 187.58,-241.2 187.58,-235.2 187.58,-235.2 187.58,-220.8 187.58,-220.8 187.58,-214.8 193.58,-208.8 199.58,-208.8 199.58,-208.8 272.42,-208.8 272.42,-208.8 278.42,-208.8 284.42,-214.8 284.42,-220.8 284.42,-220.8 284.42,-235.2 284.42,-235.2 284.42,-241.2 278.42,-247.2 272.42,-247.2"/>
+<text xml:space="preserve" text-anchor="middle" x="236" y="-231" font-family="Helvetica,Arial,sans-serif" font-size="10.00">EEGNet</text>
+<text xml:space="preserve" text-anchor="middle" x="236" y="-219" font-family="Helvetica,Arial,sans-serif" font-size="10.00">(Temporal Only)</text>
+</g>
+<!-- E&#45;&gt;J -->
+<g id="edge6" class="edge">
+<title>E-&gt;J</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M230.32,-309.7C231.36,-294.85 232.84,-273.84 234.03,-256.98"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="236.79,-257.6 234.56,-249.42 231.21,-257.21 236.79,-257.6"/>
+</g>
+<!-- K -->
+<g id="node8" class="node">
+<title>K</title>
+<path fill="#ffffff" stroke="#dee2e6" stroke-width="1.5" d="M414.89,-247.2C414.89,-247.2 325.11,-247.2 325.11,-247.2 319.11,-247.2 313.11,-241.2 313.11,-235.2 313.11,-235.2 313.11,-220.8 313.11,-220.8 313.11,-214.8 319.11,-208.8 325.11,-208.8 325.11,-208.8 414.89,-208.8 414.89,-208.8 420.89,-208.8 426.89,-214.8 426.89,-220.8 426.89,-220.8 426.89,-235.2 426.89,-235.2 426.89,-241.2 420.89,-247.2 414.89,-247.2"/>
+<text xml:space="preserve" text-anchor="middle" x="370" y="-231" font-family="Helvetica,Arial,sans-serif" font-size="10.00">EEGPsdNet</text>
+<text xml:space="preserve" text-anchor="middle" x="370" y="-219" font-family="Helvetica,Arial,sans-serif" font-size="10.00">(Late Concat Fusion)</text>
+</g>
+<!-- E&#45;&gt;K -->
+<g id="edge7" class="edge">
+<title>E-&gt;K</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M255.85,-309.47C278.39,-293.58 310.75,-270.77 335.26,-253.49"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="336.84,-255.8 341.76,-248.91 333.61,-251.23 336.84,-255.8"/>
+</g>
+<!-- L -->
+<g id="node9" class="node">
+<title>L</title>
+<path fill="#ffffff" stroke="#dee2e6" stroke-width="1.5" d="M546.48,-247.2C546.48,-247.2 467.52,-247.2 467.52,-247.2 461.52,-247.2 455.52,-241.2 455.52,-235.2 455.52,-235.2 455.52,-220.8 455.52,-220.8 455.52,-214.8 461.52,-208.8 467.52,-208.8 467.52,-208.8 546.48,-208.8 546.48,-208.8 552.48,-208.8 558.48,-214.8 558.48,-220.8 558.48,-220.8 558.48,-235.2 558.48,-235.2 558.48,-241.2 552.48,-247.2 546.48,-247.2"/>
+<text xml:space="preserve" text-anchor="middle" x="507" y="-231" font-family="Helvetica,Arial,sans-serif" font-size="10.00">EEGConnNet</text>
+<text xml:space="preserve" text-anchor="middle" x="507" y="-219" font-family="Helvetica,Arial,sans-serif" font-size="10.00">(Attention Fusion)</text>
+</g>
+<!-- E&#45;&gt;L -->
+<g id="edge8" class="edge">
+<title>E-&gt;L</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M279.02,-309.46C304.43,-300.55 335.99,-290.55 365,-284.4 398.23,-277.36 409.26,-288.49 441,-276.4 454.58,-271.23 467.92,-262.55 479.01,-254.01"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="480.75,-256.21 485.24,-249.02 477.25,-251.84 480.75,-256.21"/>
+</g>
+<!-- F&#45;&gt;K -->
+<g id="edge9" class="edge">
+<title>F-&gt;K</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" stroke-dasharray="5,2" d="M372.44,-309.7C371.99,-294.85 371.35,-273.84 370.84,-256.98"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="373.66,-257.34 370.62,-249.43 368.06,-257.51 373.66,-257.34"/>
+<text xml:space="preserve" text-anchor="middle" x="392.82" y="-287.1" font-family="Helvetica,Arial,sans-serif" font-size="9.00">Soft Gating</text>
+</g>
+<!-- G&#45;&gt;L -->
+<g id="edge10" class="edge">
+<title>G-&gt;L</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" stroke-dasharray="5,2" d="M522.43,-309.7C519.59,-294.85 515.57,-273.84 512.35,-256.98"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="515.15,-256.73 510.9,-249.4 509.65,-257.78 515.15,-256.73"/>
+<text xml:space="preserve" text-anchor="middle" x="540.19" y="-287.1" font-family="Helvetica,Arial,sans-serif" font-size="9.00">Soft Gating</text>
+</g>
+<!-- I -->
+<g id="node6" class="node">
+<title>I</title>
+<path fill="#ffffff" stroke="#dee2e6" stroke-width="1.5" d="M151.55,-176.8C151.55,-176.8 28.45,-176.8 28.45,-176.8 22.45,-176.8 16.45,-170.8 16.45,-164.8 16.45,-164.8 16.45,-152.8 16.45,-152.8 16.45,-146.8 22.45,-140.8 28.45,-140.8 28.45,-140.8 151.55,-140.8 151.55,-140.8 157.55,-140.8 163.55,-146.8 163.55,-152.8 163.55,-152.8 163.55,-164.8 163.55,-164.8 163.55,-170.8 157.55,-176.8 151.55,-176.8"/>
+<text xml:space="preserve" text-anchor="middle" x="90" y="-155.8" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Linear Discriminant Analysis</text>
+</g>
+<!-- H&#45;&gt;I -->
+<g id="edge4" class="edge">
+<title>H-&gt;I</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M92.16,-208.28C91.87,-201.66 91.53,-194.07 91.21,-186.9"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="94.03,-187.18 90.87,-179.31 88.43,-187.43 94.03,-187.18"/>
+</g>
+<!-- M -->
+<g id="node10" class="node">
+<title>M</title>
+<ellipse fill="#d4efdf" stroke="#a9dfbf" stroke-width="1.5" cx="303" cy="-54.4" rx="50.4" ry="50.4"/>
+<ellipse fill="none" stroke="#a9dfbf" stroke-width="1.5" cx="303" cy="-54.4" rx="54.4" ry="54.4"/>
+<text xml:space="preserve" text-anchor="middle" x="303" y="-63.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">Predict</text>
+<text xml:space="preserve" text-anchor="middle" x="303" y="-51.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00">(Elbow, Hand,</text>
+<text xml:space="preserve" text-anchor="middle" x="303" y="-39.4" font-family="Helvetica,Arial,sans-serif" font-size="10.00"> Forearm, Rest)</text>
+</g>
+<!-- I&#45;&gt;M -->
+<g id="edge11" class="edge">
+<title>I-&gt;M</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M126.62,-140.2C159.24,-124.51 207.52,-101.3 245.33,-83.13"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="246.08,-85.87 252.08,-79.88 243.65,-80.82 246.08,-85.87"/>
+</g>
+<!-- J&#45;&gt;M -->
+<g id="edge12" class="edge">
+<title>J-&gt;M</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M243.3,-208.31C252.01,-186 267.01,-147.59 279.79,-114.85"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="282.37,-115.95 282.67,-107.48 277.15,-113.91 282.37,-115.95"/>
+</g>
+<!-- K&#45;&gt;M -->
+<g id="edge13" class="edge">
+<title>K-&gt;M</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M362.7,-208.31C353.99,-186 338.99,-147.59 326.21,-114.85"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="328.85,-113.91 323.33,-107.48 323.63,-115.95 328.85,-113.91"/>
+</g>
+<!-- L&#45;&gt;M -->
+<g id="edge14" class="edge">
+<title>L-&gt;M</title>
+<path fill="none" stroke="#6c757d" stroke-width="1.2" d="M484.78,-208.31C453.12,-181.68 394.19,-132.11 352.01,-96.63"/>
+<polygon fill="#6c757d" stroke="#6c757d" stroke-width="1.2" points="353.92,-94.57 345.99,-91.56 350.31,-98.86 353.92,-94.57"/>
+</g>
+</g>
+</svg>
