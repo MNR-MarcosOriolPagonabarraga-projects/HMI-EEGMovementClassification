@@ -45,7 +45,7 @@ Three convolutional architectures were evaluated to assess the impact of deep fe
     \item \textbf{EEGConnNet (Connectivity Fusion):} An independent encoder architecture that processed waveform embeddings alongside the spatial coherence tensors. Softmax attention mechanisms were utilized to dynamically modulate modality weights before passing the features through a Multi-Layer Perceptron (MLP) for classification.
 \end{itemize}
 
-Figure~\ref{fig:networks} provides a visual schematic of the three evaluated convolutional paradigms. While the baseline EEGNet relies purely on spatio-temporal filtering of the time-domain epochs, EEGPsdNet and EEGConnNet introduce distinct late-fusion mechanisms to integrate spectral and spatial connectivity priors, respectively. % [cite: 25, 26, 51, 54]
+Figure~\ref{fig:networks} provides a visual schematic of the three evaluated convolutional paradigms. While the baseline EEGNet relies purely on spatio-temporal filtering of the time-domain epochs, EEGPsdNet and EEGConnNet introduce distinct late-fusion mechanisms to integrate spectral and spatial connectivity priors, respectively.
 
 \begin{figure*}[htbp]
   \centering
@@ -61,3 +61,14 @@ All trainable deep architectures were evaluated using a stratified random partit
 Network optimization was performed by minimizing a weighted cross-entropy loss function with mild label smoothing. Models were trained using the AdamW optimizer with weight decay. To ensure stable convergence, learning rates were dynamically reduced upon reaching a plateau in validation loss, and gradients were clipped. Additive Gaussian noise was applied to the EEG tensors as a data augmentation strategy to prevent overfitting. Checkpoints yielding the maximum validation accuracy were retained for final inference. 
 
 To interpret the learned feature spaces, withheld softmax precursor vectors were extracted and projected into two dimensions using $t$-Distributed Stochastic Neighbor Embedding ($t$-SNE) with matched hyperparameters across all Block II models.
+
+\subsection{Neurophysiological Validation}
+\label{sec:topo}
+To ensure the highest performing connectivity-based model was grounding its predictions in physiological reality rather than overfitting to noise or artifacts, we projected its primary feature weights back into the electrode space. Figure~\ref{fig:connTopo} summarizes the trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs against the resting state. The topology shows slight activation in the contralateral part (left) for elbow and forearm, and nearly none at hand patterns. Activation pattern for elbow and forearm seem identical, with a slight difference in the occipital area.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{connectivity_topomaps}
+  \caption{Trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs versus rest on the standard Graz layout. Activation is appropriately localized to the sensorimotor areas.}
+  \label{fig:connTopo}
+\end{figure}

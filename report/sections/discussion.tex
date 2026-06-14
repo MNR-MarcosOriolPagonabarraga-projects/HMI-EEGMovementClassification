@@ -1,26 +1,16 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\textbf{Breaking the Limits of Linear Spatial Filtering.} 
-The classification of intra-limb movements presents a severe challenge due to the heavily overlapping cortical activation patterns within the same hemisphere. As demonstrated in Table~\ref{tab:main}, the classical exploratory CSP pipeline hovered near chance-level accuracy ($\sim$36\%) for this four-class task %[cite: 79]. 
-The transition to convolutional receptive fields (Block II) yielded an immediate improvement of approximately 20 percentage points over the optimized shallow CSP baseline %[cite: 6]. 
-This substantial leap suggests that successful same-limb decoding relies heavily on non-linear spatio-temporal dynamics that simple spatial variance filters inherently fail to capture %[cite: 7]. 
-However, it is worth noting that for complete parity in future benchmarking, CSP and CNN pipelines must strictly unify band-pass envelopes, referencing, and temporal cropping before blaming spatial filtering deficits alone %[cite: 10].
+The classification of intra-limb movements presents a severe challenge due to the heavily overlapping cortical activation patterns within the same hemisphere. As demonstrated in Table~\ref{tab:main}, the classical exploratory CSP pipeline hovered near chance-level accuracy ($\sim$36\%) for this four-class task. 
+The transition to convolutional receptive fields (Block II) yielded an immediate improvement of approximately 20 percentage points over the optimized shallow CSP baseline. 
+This substantial leap suggests that successful same-limb decoding relies heavily on non-linear spatio-temporal dynamics that simple spatial variance filters inherently fail to capture.
 
 \textbf{The Efficacy and Boundaries of Multimodal Fusion.}
-While deep temporal filters began untangling the latent manifolds, synergistic movements (e.g., hand versus forearm) still suffered from significant misclassification bottlenecks %[cite: 71]. 
-Integrating multimodal priors successfully addressed this. Welch PSD concatenation and cross-spectral coherence attention each added roughly 5 percentage points of accuracy over the EEGNet-style baseline %[cite: 11]. 
-The $t$-SNE embeddings in Figure~\ref{fig:master_grid} visually confirm that fusion forces tighter intra-class clustering and resolves boundary ambiguities %[cite: 72, 73]. 
-Nevertheless, because withheld softmax inputs from different classes remain neighboring points across all Block II models %[cite: 15], 
-we conclude that auxiliary maps supply marginal, complementary constraints rather than entirely orthogonal, linearly separable geometry %[cite: 12].
+While deep temporal filters began untangling the latent manifolds, synergistic movements (e.g., hand versus forearm) still suffered from significant misclassification bottlenecks. 
+Integrating multimodal priors successfully addressed this. Welch PSD concatenation and cross-spectral coherence attention each added roughly 5 percentage points of accuracy over the EEGNet-style baseline. 
+The $t$-SNE embeddings in Figure~\ref{fig:master_grid} however do not show much clearer clusters in the fusion approaches.  
 
-\textbf{Neurophysiological Validity versus Raw Accuracy.}
-In neurotechnology, interpretable connectivity structures and final softmax margins are not interchangeable metrics %[cite: 14]. 
-While Table~\ref{tab:main} shows only modest incremental accuracy gains from connectivity fusion %[cite: 13], 
-Figure~\ref{fig:connTopo} proves that the network's attention mechanisms are physically grounded. The organized peri-central contrast between trial-averaged hand epochs and the resting state confirms that the fusion network relies on genuine sensorimotor structures rather than overfitting to hardware noise or muscular artifacts %[cite: 13, 88].
+\textbf{Attention gates.}
+While Table~\ref{tab:main} shows only modest incremental accuracy gains from connectivity fusion, 
+Figure~\ref{fig:connTopo} shows that the connectivity network organizes clusters differently than the other multimodal approaches, effectively separating the elbow class from the hand and forearm. We suspect that the attention gate holds better capabilities for motor limbs decoding for EEG.
 
-\textbf{Generalization and Future Work.}
-While this study establishes the superiority of deep multimodal fusion for complex upper-limb decoding, the current validation strategy relies on withholding trials from a pooled subject mix %[cite: 16]. 
-This approach is inherently optimistic relative to the strict leave-one-subject-out (LOSO) cross-validation required for clinical neurotechnology translation %[cite: 16]. 
-Recommended follow-ups include strictly subject-independent benchmarks to evaluate true model generalization %[cite: 4], 
-alongside the exploration of fusion designs that exploit auxiliary tensors without weakening the underlying temporal discriminability %[cite: 4].

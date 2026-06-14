@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{naturestyle}[2026/06/09 Custom Nature-style Journal Class]
+\ProvidesClass{naturestyle}[2026/06/13 Premium Journal Class]
 
 % Pass standard options to the article class
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
@@ -9,37 +9,38 @@
 % --- Geometry & Layout ---
 \RequirePackage[
   margin=0.72in,
-  top=1in,         % Pushes the main text body slightly higher up
-  headheight=1.2cm,  % Gives the logo a dedicated bounding box height
+  top=1.2in,         
+  headheight=1.5cm,  % Expanded to fix the fancyhdr UPC logo warning
   headsep=0.4in,
   columnsep=0.26in
 ]{geometry}
 \RequirePackage{microtype} 
 
 % --- Typography ---
-\RequirePackage{newtxtext,newtxmath} 
-\RequirePackage[scaled]{helvet}
+% Upgraded from Times to Palatino for a premium, book-like mathematical aesthetic
+\RequirePackage{newpxtext,newpxmath} 
+\RequirePackage[scaled=0.92]{helvet}
 
 % --- Required Packages ---
-\RequirePackage{graphicx} % Explicitly loaded here
-\RequirePackage{fancyhdr}  % Explicitly loaded here
+\RequirePackage{graphicx} 
+\RequirePackage{fancyhdr}  
 \RequirePackage{titlesec}
 \RequirePackage{caption}
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
 
 % --- Link Styling ---
-\definecolor{natureblue}{RGB}{0, 50, 100}
+\definecolor{journalblue}{RGB}{0, 52, 110} % Slightly deeper, richer blue
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
-    citecolor=natureblue,
-    urlcolor=natureblue
+    citecolor=journalblue,
+    urlcolor=journalblue
 }
 
 % --- Header/Footer Setup (fancyhdr) ---
 \pagestyle{fancy}
-\fancyhf{} % Clear default settings
+\fancyhf{} 
 
 % Styling for pages 2 and onwards
 \renewcommand{\headrulewidth}{0.4pt} 
@@ -48,10 +49,9 @@
 
 % Define a special style JUST for the title page
 \fancypagestyle{titlepage}{
-  \fancyhf{} % Clear headers and footers for the first page
-  \renewcommand{\headrulewidth}{0pt} % REMOVE the horizontal line
-  % Keep ONLY the logo in the top right, slightly lower if needed
-  \fancyhead[R]{\includegraphics[height=1.4cm,keepaspectratio]{logo-ETSEIB-upc.png}}
+  \fancyhf{} 
+  \renewcommand{\headrulewidth}{0pt} 
+  \fancyhead[L]{\raisebox{-15mm}{\includesvg[height=1.6cm,keepaspectratio]{etseib_logo}}}
 }
 
 % --- Section Headings ---
@@ -87,27 +87,32 @@
 \newcommand{\@paperabstract}{}
 \newcommand{\paperabstract}[1]{\renewcommand{\@paperabstract}{#1}}
 
-% --- Custom Maketitle ---
+% --- Custom Maketitle (Top-Tier Modern Layout) ---
 \renewcommand{\maketitle}{
   \twocolumn[
-    \begin{center}
-      \vspace*{1.5em}
-      % Use \sffamily (Helvetica), \huge, and \bfseries for the Nature style title
-      {\fontfamily{phv}\fontseries{b}\fontsize{22pt}{26pt}\selectfont \@papertitle \par}
-      \vspace{1.8em}
+    \begin{flushleft} 
+      {\fontfamily{phv}\fontseries{b}\fontsize{24pt}{28pt}\selectfont \@papertitle \par}
+      \vspace{0.8em}
       {\sffamily\large \@paperauthor \par}
-      \vspace{0.4em}
-      {\sffamily\small\color{gray} \@paperaffil \par}
-      \vspace{2.5em}
-    \end{center}
+      \vspace{0.2em}
+      {\sffamily\small\color{darkgray} \@paperaffil \par}
+      \vspace{0.8em} % Tighter space before abstract rule
+      % Top Abstract Rule
+      \noindent\rule{\textwidth}{0.8pt} 
+    \end{flushleft}
     
-    % Nature style abstract: bold, sans-serif, acting as the first paragraph
+    % Abstract Block
     \bgroup
     \sffamily\small\bfseries
-    \@paperabstract
+    \noindent \@paperabstract
     \egroup
     
-    \vspace{2.5em}
+    \begin{flushleft}
+      \vspace{0.3em}
+      % Bottom Abstract Rule
+      \noindent\rule{\textwidth}{0.8pt} 
+      \vspace{1em} % Tighter space before the main text starts
+    \end{flushleft}
   ]
-  \thispagestyle{titlepage} % Keep the line-free logo layout on page 1
+  \thispagestyle{titlepage} 
 }

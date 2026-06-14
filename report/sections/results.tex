@@ -1,16 +1,6 @@
 \section{Experimental Results}
 \label{sec:results}
 
-\subsection{Latent Representations and Error Dynamics}
-\label{sec:latent_confusion}
-To understand the performance disparities between the classical pipeline and the proposed deep learning architectures, we directly compared their pre-decision latent spaces alongside their resulting confusion matrices on the withheld validation set. This comparative $4 \times 2$ grid is presented in Figure~\ref{fig:master_grid}.
-
-The classical CSP+LDA baseline (Fig.~\ref{fig:master_grid}a, b) highlights the fundamental difficulty of intra-limb classification. While CSP spatial filters effectively map the \emph{rest} state, the feature distributions for active synergistic movements (\emph{elbow}, \emph{hand}, \emph{forearm}) are heavily overlapped in the primary component space. Consequently, the linear classifier suffers from severe off-diagonal confusion, failing to establish robust boundaries between active states.
-
-Transitioning to the convolutional baseline, EEGNet (Fig.~\ref{fig:master_grid}c, d) demonstrates the capacity of temporal receptive fields to begin untangling these manifolds. The $t$-SNE projection reveals distinct cluster formation, significantly improving global accuracy. However, noticeable bridging remains between the \emph{hand} and \emph{forearm} geometries, resulting in a misclassification bottleneck.
-
-The integration of multimodal priors actively resolves these boundary ambiguities. Both EEGPsdNet (Fig.~\ref{fig:master_grid}e, f) and EEGConnNet (Fig.~\ref{fig:master_grid}g, h) force tighter intra-class clustering and wider inter-class margins. EEGConnNet, driven by cross-spectral attention, exhibits the most isolated latent representations, successfully minimizing synergistic confusion and consolidating the diagonal accuracy matrix.
-
 \begin{figure*}[t] 
   \centering
   
@@ -56,6 +46,16 @@ The integration of multimodal priors actively resolves these boundary ambiguitie
   \label{fig:master_grid}
 \end{figure*}
 
+\subsection{Latent Representations and Error Dynamics}
+\label{sec:latent_confusion}
+To understand the performance disparities between the classical pipeline and the proposed deep learning architectures, we directly compared their pre-decision latent spaces alongside their resulting confusion matrices on the withheld validation set. This comparative $4 \times 2$ grid is presented in Figure~\ref{fig:master_grid}.
+
+The classical CSP+LDA baseline (Fig.~\ref{fig:master_grid}a, b) highlights the fundamental difficulty of intra-limb classification. CSP spatial filters for all classes (\emph{elbow}, \emph{hand}, \emph{forearm} and \emph{rest}) are heavily overlapped in the primary component space. Consequently, the linear classifier suffers from severe off-diagonal confusion, failing to establish robust boundaries between states.
+
+Transitioning to the convolutional baseline, EEGNet (Fig.~\ref{fig:master_grid}c, d) demonstrates the capacity of temporal receptive fields to begin untangling these clusters. The $t$-SNE projection reveals distinct cluster formation, significantly improving global accuracy. However, noticeable bridging remains between classes, resulting in a misclassification bottleneck.
+
+The integration of multimodal priors does not resolve these boundary ambiguities. While EEGConnNet (Fig.~\ref{fig:master_grid}g, h) force tighter intra-class clustering and wider inter-class margins, EEGPsdNet remains very similar to the baseline.
+
 \subsection{Overall Performance Benchmarks}
 \label{sec:accuracy}
 The quantitative impact of these feature space improvements is summarized in Table~\ref{tab:main}. Models were evaluated based on maximum validation accuracy during optimization, with the classical baseline fitted purely on the training partition to ensure an unbiased comparison. 
@@ -76,7 +76,7 @@ The baseline CSP approach achieved approximately 36\% accuracy, reinforcing its 
     \textbf{Model Name} & \textbf{Description \& Representations} & \textbf{Model Size} & \textbf{Accuracy [\%]} \\
     \midrule
     \textbf{Block I: CSP+LDA}~\cite{gramfort2013meg} & 
-    Motor-band CSP features after grid search across band hypotheses; classified via standard LDA. & 
+    Motor-band CSP features classified via LDA. & 
     10KB & 
     \(\sim\)36 \\
     
@@ -91,21 +91,10 @@ The baseline CSP approach achieved approximately 36\% accuracy, reinforcing its 
     \(\sim\)61 \\
     
     \textbf{Block II: EEGConnNet} & 
-    Dual-branch encoder processing raw waveforms and cross-spectral coherence matrices via dynamic modality attention. & 
+    Dual-branch processing raw waveforms and cross-spectral coherence matrices. & 
     160KB & 
     \(\sim\)61\,--\,62 \\
     \bottomrule
   \end{tabularx}
   \endgroup
 \end{table*}
-
-\subsection{Neurophysiological Validation}
-\label{sec:topo}
-To ensure the highest performing connectivity-based model was grounding its predictions in physiological reality rather than overfitting to noise or artifacts, we projected its primary feature weights back into the electrode space. Figure~\ref{fig:connTopo} summarizes the trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs against the resting state. The resulting topology confirms that the network successfully isolated task-relevant nodes localized over the contralateral sensorimotor cortex, validating the neurophysiological integrity of the fusion network's decision mechanism.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{connectivity_topomaps}
-  \caption{Trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs versus rest on the standard Graz layout. Activation is appropriately localized to the sensorimotor areas.}
-  \label{fig:connTopo}
-\end{figure}
