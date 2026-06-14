@@ -1,0 +1,74 @@
+\section{Materials and Methods}
+\label{sec:methods}
+
+\subsection{Dataset and Preprocessing Pipeline}
+\label{sec:dataprep}
+This study utilized the openly available Graz movement-execution EEG corpus~\cite{ofner2017upper}, recorded while volunteers performed sustained upper-limb actions including elbow, forearm, and hand synergies, alongside a resting state (BNCI Horizon 2020, accession \texttt{001-2017}). To focus on the sensorimotor cortex, analyses were restricted to twenty-one peri-central electrodes spanning the fronto-central, central, and centro-parietal regions (FC5--FC6, FCz, C5--C6, Cz, CP5--CP6, CPz). The spatial coverage of this selected motor montage is illustrated in Fig.~\ref{fig:montage}. 
+
+\begin{figure}[H]
+  \centering
+  \includesvg[width=0.7\linewidth]{motor_channels_topoplot} 
+  \caption{Topographical layout of the 21 selected peri-central EEG channels used for feature extraction and classification, targeting the sensorimotor cortex.}
+  \label{fig:montage}
+\end{figure}
+
+Continuous EEG signals were downsampled to $128\,\text{Hz}$ and subjected to a mains-notch filter, followed by an FIR band-pass filter between $0.5$ and $40\,\text{Hz}$ using zero-phase kernels to preserve temporal dynamics. Cue-locked epochs were extracted from $-0.5$ to $2.0\,\text{s}$ relative to the stimulus onset. To ensure signal quality, trials containing peak EEG magnitudes exceeding $\pm 200\,\mu\text{V}$ were discarded prior to any data augmentation. Finally, mirror movement directions (e.g., flexion/extension, supination/pronation, open/close) were pooled to form a robust four-class intra-limb classification problem: \emph{elbow}, \emph{hand}, \emph{forearm}, and \emph{rest}.
+
+\subsection{Feature Extraction and Multimodal Tensors}
+\label{sec:features}
+To evaluate the efficacy of multimodal data fusion in deep learning architectures, three distinct representational tensors were extracted from the preprocessed epochs (as illustrated in Fig.~\ref{fig:pipe}):
+\begin{itemize}
+    \item \textbf{Temporal:} The core input consisted of per-trial, per-electrode temporally normalized EEG voltage epochs.
+    \item \textbf{Spectral:} Welch power spectral density (PSD) maps were computed between $3$ and $30\,\text{Hz}$, capturing the logarithmic-magnitude frequency responses associated with motor execution.
+    \item \textbf{Connectivity:} Phase-coupling descriptors were derived from the modulus of pairwise complex Morlet cross-spectral densities at $10\,\text{Hz}$ ($\mu$-band) and $22\,\text{Hz}$ ($\beta$-band). These were summed over unordered electrode pairs and globally standardized to represent functional network connectivity.
+\end{itemize}
+
+\begin{figure*}[t]
+  \centering
+  \includesvg[width=0.7\linewidth, inkscapelatex=false]{pipeline}
+  \caption{Schematic of the preprocessing and feature extraction pipeline feeding the proposed deep learning architectures. The PSD and connectivity branches serve as optional inputs depending on the specific model variant evaluated.}
+  \label{fig:pipe}
+\end{figure*}
+
+\subsection{Classification Architectures}
+\label{sec:architectures}
+The classification task was approached using two distinct paradigms: a classical spatial filtering baseline (Block I) and a set of differentiable temporal receptive field networks (Block II).
+
+\subsubsection{Block I: CSP with LDA Baseline}
+The baseline implemented the canonical motor-BCI blueprint~\cite{gramfort2013meg}. Common Spatial Pattern (CSP) filters were optimized to maximize the logarithmic-band-power variance ratios between classes. The first six orthogonal spatial patterns were selected to project the EEG epochs into a reduced feature vector ($\mathbb{R}^6$), which was subsequently classified using Linear Discriminant Analysis (LDA).
+
+\subsubsection{Block II: Convolutional Neural Networks}
+Three convolutional architectures were evaluated to assess the impact of deep feature extraction and multimodal fusion:
+\begin{itemize}
+    \item \textbf{EEGNet Baseline:} A compact, separable convolutional network designed directly for filtered EEG epoch tensors~\cite{lawhern2018eegnet}.
+    \item \textbf{EEGPsdNet (Spectral Fusion):} A dual-branch architecture employing late fusion. Embeddings from the temporal CNN stem were concatenated with shallow convolutional embeddings extracted from the Welch PSD maps. The fused vector was batch-normalized prior to the final softmax classification layer.
+    \item \textbf{EEGConnNet (Connectivity Fusion):} An independent encoder architecture that processed waveform embeddings alongside the spatial coherence tensors. Softmax attention mechanisms were utilized to dynamically modulate modality weights before passing the features through a Multi-Layer Perceptron (MLP) for classification.
+\end{itemize}
+
+Figure~\ref{fig:networks} provides a visual schematic of the three evaluated convolutional paradigms. While the baseline EEGNet relies purely on spatio-temporal filtering of the time-domain epochs, EEGPsdNet and EEGConnNet introduce distinct late-fusion mechanisms to integrate spectral and spatial connectivity priors, respectively.
+
+\begin{figure*}[htbp]
+  \centering
+  \includesvg[width=\linewidth, inkscapelatex=false]{network_architectures}
+  \caption{Schematic overview of the three evaluated convolutional architectures. The baseline EEGNet utilizes strictly temporal and spatial convolutions. EEGPsdNet implements a late-fusion concatenation with spectral maps, while EEGConnNet employs a dynamic attention gate to adaptively weight temporal and connectivity embeddings prior to the final classification.}
+  \label{fig:networks}
+\end{figure*}
+
+\subsection{Training and Evaluation Protocol}
+\label{sec:training}
+All trainable deep architectures were evaluated using a stratified random partition of the pooled subject data, allocating approximately 85\% of trials for training and 15\% for validation. A fixed pseudo-random seed was maintained across all runs to ensure comparable convergence noise. 
+
+Network optimization was performed by minimizing a weighted cross-entropy loss function with mild label smoothing. Models were trained using the AdamW optimizer with weight decay. To ensure stable convergence, learning rates were dynamically reduced upon reaching a plateau in validation loss, and gradients were clipped. Additive Gaussian noise was applied to the EEG tensors as a data augmentation strategy to prevent overfitting. Checkpoints yielding the maximum validation accuracy were retained for final inference. 
+
+To interpret the learned feature spaces, withheld softmax precursor vectors were extracted and projected into two dimensions using $t$-Distributed Stochastic Neighbor Embedding ($t$-SNE) with matched hyperparameters across all Block II models.
+
+\subsection{Neurophysiological Validation}
+\label{sec:topo}
+To ensure the highest performing connectivity-based model was grounding its predictions in physiological reality rather than overfitting to noise or artifacts, we projected its primary feature weights back into the electrode space. Figure~\ref{fig:connTopo} summarizes the trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs against the resting state. The topology shows slight activation in the contralateral part (left) for elbow and forearm, and nearly none at hand patterns. Activation pattern for elbow and forearm seem identical, with a slight difference in the occipital area.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{connectivity_topomaps}
+  \caption{Trial-averaged connectivity-derived spatial patterns contrasting hand synergy epochs versus rest on the standard Graz layout. Activation is appropriately localized to the sensorimotor areas.}
+  \label{fig:connTopo}
+\end{figure}

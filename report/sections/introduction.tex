@@ -1,0 +1,21 @@
+\section{Introduction}
+\label{sec:intro}
+
+The ability to accurately decode complex upper-limb movement states from non-invasive scalp electroencephalography (EEG) is a critical driver for advancements in brain-computer interfaces (BCIs), targeted neurorehabilitation, and robotic assistive devices~\cite{ofner2017upper}. However, signal quality at the scalp is inherently limited by spatial mixing due to volume conduction, low signal-to-noise ratio (SNR), and high inter-trial variability. These factors make multiclass intra-limb decoding particularly challenging compared to standard binary inter-limb tasks.
+
+To address these challenges, this study systematically compares two distinct analytical frameworks applied to identical cue-locked data. 
+\textbf{Block~I} serves as the baseline, utilizing a classical \emph{CSP+LDA pipeline}: handcrafted spatial filters optimized for discriminative variance, followed by a linear Gaussian classifier~\cite{gramfort2013meg}. 
+\textbf{Block~II} introduces a set of \emph{convolutional decoders}. This includes a standard EEGNet-style architecture~\cite{lawhern2018eegnet} operating on filtered, cue-locked voltage epochs, alongside two custom dual-branch models. These custom models are designed to include auxiliary features derived from Welch power spectral density (PSD) maps and pairwise wavelet cross-spectral connectivity.
+
+This comparative approach demonstrates that transitioning from traditional linear models to deep learning networks with temporal awareness significantly improves classification accuracy. Furthermore, we show additional performance gains by integrating multimodal feature fusion.
+
+\begin{figure*}[t]
+  \centering
+  \includesvg[width=\linewidth]{filtered_eeg_grand_average} 
+  \caption{Grand-average cue-locked EEG waveforms.}
+  \label{fig:grandavg}
+\end{figure*}
+
+\textbf{Data.} All experiments utilize the open-source Graz movement-execution corpus~\cite{ofner2017upper}. Code and preprocessing configurations are publicly available in the GitHub repository referenced in the Acknowledgments.
+
+Figure~\ref{fig:grandavg} illustrates the condition-averaged sensorimotor waveforms obtained after the initial filtering and segmentation pipeline.

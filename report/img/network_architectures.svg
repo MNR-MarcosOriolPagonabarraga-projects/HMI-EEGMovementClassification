@@ -1,0 +1,276 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1248pt" height="652pt" viewBox="0.00 0.00 1248.4 652.40">
+<g id="graph0" class="graph" transform="translate(7.199999809265137,645.2000122070312) scale(1)" data-name="NetworkArchitectures">
+
+<polygon fill="white" stroke="none" points="-7.2,7.2 -7.2,-645.2 1241.2,-645.2 1241.2,7.2 -7.2,7.2"/>
+<g id="clust1" class="cluster" data-name="cluster_eegnet">
+
+<path fill="none" stroke="#e0e0e0" stroke-width="1.5" d="M20,-8C20,-8 200,-8 200,-8 206,-8 212,-14 212,-20 212,-20 212,-618 212,-618 212,-624 206,-630 200,-630 200,-630 20,-630 20,-630 14,-630 8,-624 8,-618 8,-618 8,-20 8,-20 8,-14 14,-8 20,-8"/>
+<text text-anchor="middle" x="110" y="-615.2" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="12.00">1. EEGNet (Temporal Baseline)</text>
+</g>
+<g id="clust2" class="cluster" data-name="cluster_psdnet">
+
+<path fill="none" stroke="#e0e0e0" stroke-width="1.5" d="M236,-209.8C236,-209.8 632,-209.8 632,-209.8 638,-209.8 644,-215.8 644,-221.8 644,-221.8 644,-618 644,-618 644,-624 638,-630 632,-630 632,-630 236,-630 236,-630 230,-630 224,-624 224,-618 224,-618 224,-221.8 224,-221.8 224,-215.8 230,-209.8 236,-209.8"/>
+<text text-anchor="middle" x="434" y="-615.2" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="12.00">2. EEGPsdNet (Spectral Fusion)</text>
+</g>
+<g id="clust3" class="cluster" data-name="cluster_connnet">
+
+<path fill="none" stroke="#e0e0e0" stroke-width="1.5" d="M666,-8C666,-8 1214,-8 1214,-8 1220,-8 1226,-14 1226,-20 1226,-20 1226,-614.5 1226,-614.5 1226,-620.5 1220,-626.5 1214,-626.5 1214,-626.5 666,-626.5 666,-626.5 660,-626.5 654,-620.5 654,-614.5 654,-614.5 654,-20 654,-20 654,-14 660,-8 666,-8"/>
+<text text-anchor="middle" x="940" y="-611.7" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="12.00">3. EEGConnNet (Connectivity Fusion)</text>
+</g>
+<!-- e_in -->
+<g id="node1" class="node" pointer-events="visible" data-name="e_in">
+
+<path fill="#e3f2fd" stroke="#90caf9" stroke-width="1.2" d="M170,-577.6C170,-577.6 50,-577.6 50,-577.6 44,-577.6 38,-571.6 38,-565.6 38,-565.6 38,-539.6 38,-539.6 38,-533.6 44,-527.6 50,-527.6 50,-527.6 170,-527.6 170,-527.6 176,-527.6 182,-533.6 182,-539.6 182,-539.6 182,-565.6 182,-565.6 182,-571.6 176,-577.6 170,-577.6"/>
+<text text-anchor="middle" x="110" y="-555.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Time-Domain Epoch</text>
+<text text-anchor="middle" x="110" y="-543.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Batch, 1, 21, Time)</text>
+</g>
+<!-- e_tconv -->
+<g id="node2" class="node" pointer-events="visible" data-name="e_tconv">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M170,-479.1C170,-479.1 50,-479.1 50,-479.1 44,-479.1 38,-473.1 38,-467.1 38,-467.1 38,-448.1 38,-448.1 38,-442.1 44,-436.1 50,-436.1 50,-436.1 170,-436.1 170,-436.1 176,-436.1 182,-442.1 182,-448.1 182,-448.1 182,-467.1 182,-467.1 182,-473.1 176,-479.1 170,-479.1"/>
+<text text-anchor="middle" x="110" y="-460.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Temporal Conv</text>
+<text text-anchor="middle" x="110" y="-448.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Bandpass Filter)</text>
+</g>
+<!-- e_in&#45;&gt;e_tconv -->
+<g id="edge1" class="edge" data-name="e_in-&gt;e_tconv">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M110,-527.65C110,-515.17 110,-499.83 110,-486.78"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="112.1,-486.82 110,-480.82 107.9,-486.82 112.1,-486.82"/>
+</g>
+<!-- e_sconv -->
+<g id="node3" class="node" pointer-events="visible" data-name="e_sconv">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M170,-374.3C170,-374.3 50,-374.3 50,-374.3 44,-374.3 38,-368.3 38,-362.3 38,-362.3 38,-343.3 38,-343.3 38,-337.3 44,-331.3 50,-331.3 50,-331.3 170,-331.3 170,-331.3 176,-331.3 182,-337.3 182,-343.3 182,-343.3 182,-362.3 182,-362.3 182,-368.3 176,-374.3 170,-374.3"/>
+<text text-anchor="middle" x="110" y="-355.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Depthwise Spatial Conv</text>
+<text text-anchor="middle" x="110" y="-343.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Spatial Filter)</text>
+</g>
+<!-- e_tconv&#45;&gt;e_sconv -->
+<g id="edge2" class="edge" data-name="e_tconv-&gt;e_sconv">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M110,-436.29C110,-420.66 110,-398.89 110,-381.64"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="112.1,-381.88 110,-375.88 107.9,-381.88 112.1,-381.88"/>
+</g>
+<!-- e_sep -->
+<g id="node4" class="node" pointer-events="visible" data-name="e_sep">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M170,-282.8C170,-282.8 50,-282.8 50,-282.8 44,-282.8 38,-276.8 38,-270.8 38,-270.8 38,-251.8 38,-251.8 38,-245.8 44,-239.8 50,-239.8 50,-239.8 170,-239.8 170,-239.8 176,-239.8 182,-245.8 182,-251.8 182,-251.8 182,-270.8 182,-270.8 182,-276.8 176,-282.8 170,-282.8"/>
+<text text-anchor="middle" x="110" y="-264.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Separable Conv</text>
+<text text-anchor="middle" x="110" y="-252.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Temporal Summary)</text>
+</g>
+<!-- e_sconv&#45;&gt;e_sep -->
+<g id="edge3" class="edge" data-name="e_sconv-&gt;e_sep">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M110,-331.49C110,-319.25 110,-303.48 110,-290.09"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="112.1,-290.34 110,-284.34 107.9,-290.34 112.1,-290.34"/>
+</g>
+<!-- e_flat -->
+<g id="node5" class="node" pointer-events="visible" data-name="e_flat">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M170,-169C170,-169 50,-169 50,-169 44,-169 38,-163 38,-157 38,-157 38,-138 38,-138 38,-132 44,-126 50,-126 50,-126 170,-126 170,-126 176,-126 182,-132 182,-138 182,-138 182,-157 182,-157 182,-163 176,-169 170,-169"/>
+<text text-anchor="middle" x="110" y="-144.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Flatten Feature Map</text>
+</g>
+<!-- e_sep&#45;&gt;e_flat -->
+<g id="edge4" class="edge" data-name="e_sep-&gt;e_flat">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M110,-240.05C110,-222.36 110,-196.48 110,-176.74"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="112.1,-176.79 110,-170.79 107.9,-176.79 112.1,-176.79"/>
+</g>
+<!-- e_out -->
+<g id="node6" class="node" pointer-events="visible" data-name="e_out">
+
+<path fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1.2" d="M170,-81C170,-81 50,-81 50,-81 44,-81 38,-75 38,-69 38,-69 38,-50 38,-50 38,-44 44,-38 50,-38 50,-38 170,-38 170,-38 176,-38 182,-44 182,-50 182,-50 182,-69 182,-69 182,-75 176,-81 170,-81"/>
+<text text-anchor="middle" x="110" y="-62.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Linear Classifier</text>
+<text text-anchor="middle" x="110" y="-50.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Softmax)</text>
+</g>
+<!-- e_flat&#45;&gt;e_out -->
+<g id="edge5" class="edge" data-name="e_flat-&gt;e_out">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M110,-126.12C110,-114.87 110,-100.74 110,-88.48"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="112.1,-88.55 110,-82.55 107.9,-88.55 112.1,-88.55"/>
+</g>
+<!-- p_in_raw -->
+<g id="node7" class="node" pointer-events="visible" data-name="p_in_raw">
+
+<path fill="#e3f2fd" stroke="#90caf9" stroke-width="1.2" d="M602,-574.1C602,-574.1 482,-574.1 482,-574.1 476,-574.1 470,-568.1 470,-562.1 470,-562.1 470,-543.1 470,-543.1 470,-537.1 476,-531.1 482,-531.1 482,-531.1 602,-531.1 602,-531.1 608,-531.1 614,-537.1 614,-543.1 614,-543.1 614,-562.1 614,-562.1 614,-568.1 608,-574.1 602,-574.1"/>
+<text text-anchor="middle" x="542" y="-549.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Time-Domain Epoch</text>
+</g>
+<!-- p_raw_enc -->
+<g id="node9" class="node" pointer-events="visible" data-name="p_raw_enc">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M602,-482.6C602,-482.6 482,-482.6 482,-482.6 476,-482.6 470,-476.6 470,-470.6 470,-470.6 470,-444.6 470,-444.6 470,-438.6 476,-432.6 482,-432.6 482,-432.6 602,-432.6 602,-432.6 608,-432.6 614,-438.6 614,-444.6 614,-444.6 614,-470.6 614,-470.6 614,-476.6 608,-482.6 602,-482.6"/>
+<text text-anchor="middle" x="542" y="-460.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">EEGNet Conv Stem</text>
+<text text-anchor="middle" x="542" y="-448.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Temp+Spatial+Sep)</text>
+</g>
+<!-- p_in_raw&#45;&gt;p_raw_enc -->
+<g id="edge6" class="edge" data-name="p_in_raw-&gt;p_raw_enc">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M542,-531.42C542,-519.36 542,-503.78 542,-490.13"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="544.1,-490.18 542,-484.18 539.9,-490.18 544.1,-490.18"/>
+</g>
+<!-- p_in_psd -->
+<g id="node8" class="node" pointer-events="visible" data-name="p_in_psd">
+
+<path fill="#f3e5f5" stroke="#ce93d8" stroke-width="1.2" d="M386,-577.6C386,-577.6 266,-577.6 266,-577.6 260,-577.6 254,-571.6 254,-565.6 254,-565.6 254,-539.6 254,-539.6 254,-533.6 260,-527.6 266,-527.6 266,-527.6 386,-527.6 386,-527.6 392,-527.6 398,-533.6 398,-539.6 398,-539.6 398,-565.6 398,-565.6 398,-571.6 392,-577.6 386,-577.6"/>
+<text text-anchor="middle" x="326" y="-555.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Welch PSD Maps</text>
+<text text-anchor="middle" x="326" y="-543.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Batch, 1, 21, 28)</text>
+</g>
+<!-- p_psd_enc -->
+<g id="node10" class="node" pointer-events="visible" data-name="p_psd_enc">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M386,-482.6C386,-482.6 266,-482.6 266,-482.6 260,-482.6 254,-476.6 254,-470.6 254,-470.6 254,-444.6 254,-444.6 254,-438.6 260,-432.6 266,-432.6 266,-432.6 386,-432.6 386,-432.6 392,-432.6 398,-438.6 398,-444.6 398,-444.6 398,-470.6 398,-470.6 398,-476.6 392,-482.6 386,-482.6"/>
+<text text-anchor="middle" x="326" y="-460.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Spectral + Spatial</text>
+<text text-anchor="middle" x="326" y="-448.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Convolutions</text>
+</g>
+<!-- p_in_psd&#45;&gt;p_psd_enc -->
+<g id="edge7" class="edge" data-name="p_in_psd-&gt;p_psd_enc">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M326,-527.65C326,-516.26 326,-502.49 326,-490.25"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="328.1,-490.28 326,-484.28 323.9,-490.28 328.1,-490.28"/>
+</g>
+<!-- p_concat -->
+<g id="node11" class="node" pointer-events="visible" data-name="p_concat">
+
+<path fill="#fff3e0" stroke="#ffcc80" stroke-width="1.2" d="M386,-374.3C386,-374.3 266,-374.3 266,-374.3 260,-374.3 254,-368.3 254,-362.3 254,-362.3 254,-343.3 254,-343.3 254,-337.3 260,-331.3 266,-331.3 266,-331.3 386,-331.3 386,-331.3 392,-331.3 398,-337.3 398,-343.3 398,-343.3 398,-362.3 398,-362.3 398,-368.3 392,-374.3 386,-374.3"/>
+<text text-anchor="middle" x="326" y="-361.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Concatenation</text>
+<text text-anchor="middle" x="326" y="-349.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">+</text>
+<text text-anchor="middle" x="326" y="-337.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">BatchNorm1d</text>
+</g>
+<!-- p_raw_enc&#45;&gt;p_concat -->
+<g id="edge8" class="edge" data-name="p_raw_enc-&gt;p_concat">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M491.63,-432.63C456.69,-416 410.36,-393.95 375.59,-377.4"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="376.75,-375.63 370.43,-374.95 374.95,-379.42 376.75,-375.63"/>
+<text text-anchor="middle" x="457.75" y="-402.5" font-family="Helvetica, Arial, sans-serif" font-size="9.00" fill="#616161"> 128 dims</text>
+</g>
+<!-- p_psd_enc&#45;&gt;p_concat -->
+<g id="edge9" class="edge" data-name="p_psd_enc-&gt;p_concat">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M326,-432.76C326,-417.47 326,-397.55 326,-381.55"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="328.1,-381.86 326,-375.86 323.9,-381.86 328.1,-381.86"/>
+<text text-anchor="middle" x="343.75" y="-402.5" font-family="Helvetica, Arial, sans-serif" font-size="9.00" fill="#616161"> 112 dims</text>
+</g>
+<!-- p_out -->
+<g id="node12" class="node" pointer-events="visible" data-name="p_out">
+
+<path fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1.2" d="M386,-282.8C386,-282.8 266,-282.8 266,-282.8 260,-282.8 254,-276.8 254,-270.8 254,-270.8 254,-251.8 254,-251.8 254,-245.8 260,-239.8 266,-239.8 266,-239.8 386,-239.8 386,-239.8 392,-239.8 398,-245.8 398,-251.8 398,-251.8 398,-270.8 398,-270.8 398,-276.8 392,-282.8 386,-282.8"/>
+<text text-anchor="middle" x="326" y="-264.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Linear Classifier</text>
+<text text-anchor="middle" x="326" y="-252.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Softmax)</text>
+</g>
+<!-- p_concat&#45;&gt;p_out -->
+<g id="edge10" class="edge" data-name="p_concat-&gt;p_out">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M326,-331.49C326,-319.25 326,-303.48 326,-290.09"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="328.1,-290.34 326,-284.34 323.9,-290.34 328.1,-290.34"/>
+</g>
+<!-- c_in_raw -->
+<g id="node13" class="node" pointer-events="visible" data-name="c_in_raw">
+
+<path fill="#e3f2fd" stroke="#90caf9" stroke-width="1.2" d="M1109,-574.1C1109,-574.1 989,-574.1 989,-574.1 983,-574.1 977,-568.1 977,-562.1 977,-562.1 977,-543.1 977,-543.1 977,-537.1 983,-531.1 989,-531.1 989,-531.1 1109,-531.1 1109,-531.1 1115,-531.1 1121,-537.1 1121,-543.1 1121,-543.1 1121,-562.1 1121,-562.1 1121,-568.1 1115,-574.1 1109,-574.1"/>
+<text text-anchor="middle" x="1049" y="-549.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Time-Domain Epoch</text>
+</g>
+<!-- c_raw_enc -->
+<g id="node15" class="node" pointer-events="visible" data-name="c_raw_enc">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M1109,-479.1C1109,-479.1 989,-479.1 989,-479.1 983,-479.1 977,-473.1 977,-467.1 977,-467.1 977,-448.1 977,-448.1 977,-442.1 983,-436.1 989,-436.1 989,-436.1 1109,-436.1 1109,-436.1 1115,-436.1 1121,-442.1 1121,-448.1 1121,-448.1 1121,-467.1 1121,-467.1 1121,-473.1 1115,-479.1 1109,-479.1"/>
+<text text-anchor="middle" x="1049" y="-454.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">EEGNet Conv Stem</text>
+</g>
+<!-- c_in_raw&#45;&gt;c_raw_enc -->
+<g id="edge11" class="edge" data-name="c_in_raw-&gt;c_raw_enc">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M1049,-531.42C1049,-518.35 1049,-501.14 1049,-486.73"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="1051.1,-486.88 1049,-480.88 1046.9,-486.88 1051.1,-486.88"/>
+</g>
+<!-- c_in_conn -->
+<g id="node14" class="node" pointer-events="visible" data-name="c_in_conn">
+
+<path fill="#f3e5f5" stroke="#ce93d8" stroke-width="1.2" d="M818,-482.6C818,-482.6 698,-482.6 698,-482.6 692,-482.6 686,-476.6 686,-470.6 686,-470.6 686,-444.6 686,-444.6 686,-438.6 692,-432.6 698,-432.6 698,-432.6 818,-432.6 818,-432.6 824,-432.6 830,-438.6 830,-444.6 830,-444.6 830,-470.6 830,-470.6 830,-476.6 824,-482.6 818,-482.6"/>
+<text text-anchor="middle" x="758" y="-460.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Connectivity Matrix</text>
+<text text-anchor="middle" x="758" y="-448.6" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(420 Pairs)</text>
+</g>
+<!-- c_conn_enc -->
+<g id="node17" class="node" pointer-events="visible" data-name="c_conn_enc">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M818,-377.8C818,-377.8 698,-377.8 698,-377.8 692,-377.8 686,-371.8 686,-365.8 686,-365.8 686,-339.8 686,-339.8 686,-333.8 692,-327.8 698,-327.8 698,-327.8 818,-327.8 818,-327.8 824,-327.8 830,-333.8 830,-339.8 830,-339.8 830,-365.8 830,-365.8 830,-371.8 824,-377.8 818,-377.8"/>
+<text text-anchor="middle" x="758" y="-355.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Connectivity Encoder</text>
+<text text-anchor="middle" x="758" y="-343.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(MLP 420 → 64 → 32)</text>
+</g>
+<!-- c_in_conn&#45;&gt;c_conn_enc -->
+<g id="edge13" class="edge" data-name="c_in_conn-&gt;c_conn_enc">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M758,-432.76C758,-418.61 758,-400.52 758,-385.22"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="760.1,-385.33 758,-379.33 755.9,-385.33 760.1,-385.33"/>
+</g>
+<!-- c_raw_comp -->
+<g id="node16" class="node" pointer-events="visible" data-name="c_raw_comp">
+
+<path fill="#ffffff" stroke="#bdbdbd" stroke-width="1.2" d="M1109,-377.8C1109,-377.8 989,-377.8 989,-377.8 983,-377.8 977,-371.8 977,-365.8 977,-365.8 977,-339.8 977,-339.8 977,-333.8 983,-327.8 989,-327.8 989,-327.8 1109,-327.8 1109,-327.8 1115,-327.8 1121,-333.8 1121,-339.8 1121,-339.8 1121,-365.8 1121,-365.8 1121,-371.8 1115,-377.8 1109,-377.8"/>
+<text text-anchor="middle" x="1049" y="-355.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Temporal Compressor</text>
+<text text-anchor="middle" x="1049" y="-343.8" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Linear 128 → 32)</text>
+</g>
+<!-- c_raw_enc&#45;&gt;c_raw_comp -->
+<g id="edge12" class="edge" data-name="c_raw_enc-&gt;c_raw_comp">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M1049,-436.29C1049,-421.68 1049,-401.69 1049,-385.05"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="1051.1,-385.49 1049,-379.49 1046.9,-385.49 1051.1,-385.49"/>
+</g>
+<!-- c_attn -->
+<g id="node18" class="node" pointer-events="visible" data-name="c_attn">
+
+<path fill="#fff3e0" stroke="#ffcc80" stroke-width="1.2" d="M1000,-282.8C1000,-282.8 880,-282.8 880,-282.8 874,-282.8 868,-276.8 868,-270.8 868,-270.8 868,-251.8 868,-251.8 868,-245.8 874,-239.8 880,-239.8 880,-239.8 1000,-239.8 1000,-239.8 1006,-239.8 1012,-245.8 1012,-251.8 1012,-251.8 1012,-270.8 1012,-270.8 1012,-276.8 1006,-282.8 1000,-282.8"/>
+<text text-anchor="middle" x="940" y="-264.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Dynamic Attention Gate</text>
+<text text-anchor="middle" x="940" y="-252.3" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Softmax)</text>
+</g>
+<!-- c_raw_comp&#45;&gt;c_attn -->
+<g id="edge14" class="edge" data-name="c_raw_comp-&gt;c_attn">
+
+<path fill="none" stroke="#9e9e9e" stroke-width="1.2" stroke-dasharray="1,5" d="M1019.79,-327.82C1002.64,-313.73 981.19,-296.12 964.85,-282.71"/>
+</g>
+<!-- c_fuse -->
+<g id="node19" class="node" pointer-events="visible" data-name="c_fuse">
+
+<path fill="#fff3e0" stroke="#ffcc80" stroke-width="1.2" d="M1000,-169C1000,-169 880,-169 880,-169 874,-169 868,-163 868,-157 868,-157 868,-138 868,-138 868,-132 874,-126 880,-126 880,-126 1000,-126 1000,-126 1006,-126 1012,-132 1012,-138 1012,-138 1012,-157 1012,-157 1012,-163 1006,-169 1000,-169"/>
+<text text-anchor="middle" x="940" y="-150.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">Weighted Fusion</text>
+<text text-anchor="middle" x="940" y="-138.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Element-wise Sum)</text>
+</g>
+<!-- c_raw_comp&#45;&gt;c_fuse -->
+<g id="edge16" class="edge" data-name="c_raw_comp-&gt;c_fuse">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M1055.62,-328.04C1062.5,-298.2 1069.53,-246.48 1048,-209.8 1038.56,-193.71 1023.16,-181.5 1006.92,-172.38"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="1008.3,-170.73 1002.02,-169.76 1006.32,-174.44 1008.3,-170.73"/>
+<text text-anchor="middle" x="1082.12" y="-258.6" font-family="Helvetica, Arial, sans-serif" font-size="9.00" fill="#616161">  x w_temp</text>
+</g>
+<!-- c_conn_enc&#45;&gt;c_attn -->
+<g id="edge15" class="edge" data-name="c_conn_enc-&gt;c_attn">
+
+<path fill="none" stroke="#9e9e9e" stroke-width="1.2" stroke-dasharray="1,5" d="M806.77,-327.82C835.41,-313.73 871.22,-296.12 898.5,-282.71"/>
+</g>
+<!-- c_conn_enc&#45;&gt;c_fuse -->
+<g id="edge17" class="edge" data-name="c_conn_enc-&gt;c_fuse">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M757.46,-328.02C758.03,-297.2 763.51,-243.44 792.26,-209.8 809.98,-189.05 835.87,-175.2 861.04,-166.01"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="861.42,-168.1 866.4,-164.14 860.04,-164.14 861.42,-168.1"/>
+<text text-anchor="middle" x="811.87" y="-258.6" font-family="Helvetica, Arial, sans-serif" font-size="9.00" fill="#616161">  x w_conn</text>
+</g>
+<!-- c_attn&#45;&gt;c_fuse -->
+<g id="edge18" class="edge" data-name="c_attn-&gt;c_fuse">
+
+<path fill="none" stroke="#f57c00" stroke-width="1.2" stroke-dasharray="5,2" d="M940,-240.05C940,-222.36 940,-196.48 940,-176.74"/>
+<polygon fill="#f57c00" stroke="#f57c00" stroke-width="1.2" points="942.1,-176.79 940,-170.79 937.9,-176.79 942.1,-176.79"/>
+<text text-anchor="middle" x="955.12" y="-193.7" font-family="Helvetica, Arial, sans-serif" font-size="9.00" fill="#f57c00"> weights</text>
+</g>
+<!-- c_out -->
+<g id="node20" class="node" pointer-events="visible" data-name="c_out">
+
+<path fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1.2" d="M1000,-81C1000,-81 880,-81 880,-81 874,-81 868,-75 868,-69 868,-69 868,-50 868,-50 868,-44 874,-38 880,-38 880,-38 1000,-38 1000,-38 1006,-38 1012,-44 1012,-50 1012,-50 1012,-69 1012,-69 1012,-75 1006,-81 1000,-81"/>
+<text text-anchor="middle" x="940" y="-62.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">MLP Classifier</text>
+<text text-anchor="middle" x="940" y="-50.5" font-family="Helvetica, Arial, sans-serif" font-size="10.00">(Softmax)</text>
+</g>
+<!-- c_fuse&#45;&gt;c_out -->
+<g id="edge19" class="edge" data-name="c_fuse-&gt;c_out">
+
+<path fill="none" stroke="#757575" stroke-width="1.2" d="M940,-126.12C940,-114.87 940,-100.74 940,-88.48"/>
+<polygon fill="#757575" stroke="#757575" stroke-width="1.2" points="942.1,-88.55 940,-82.55 937.9,-88.55 942.1,-88.55"/>
+</g>
+</g>
+</svg>

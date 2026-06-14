@@ -1,6 +1,4 @@
-\documentclass[11pt,twocolumn,a4paper]{article}
-
-\usepackage[margin=0.72in,columnsep=0.26in]{geometry}
+\documentclass{naturestyle}
 
 \input{preamble}
 \input{commands}
@@ -9,23 +7,14 @@
 \begin{document}
 
 \input{metadata}
+\paperabstract{\input{sections/abstract}}
 
-\twocolumn[
-\begin{center}
-{\Large\bfseries \papertitle\par}
-\vspace{0.6em}
-{\normalsize \paperauthor\par}
-{\small \paperaffil\par}
-\vspace{1.1em}
-\end{center}
-\input{abstract}
-]
+\maketitle
 
-\input{introduction}
-\input{methods}
-\input{results}
-\input{discussion}
-\input{conclusion}
+\input{sections/introduction}
+\input{sections/methods}
+\input{sections/results}
+\input{sections/discussion}
 
 \section*{Acknowledgment}
 Code:\linebreak
